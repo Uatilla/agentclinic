@@ -4,6 +4,27 @@
 Specs (Markdown in `specs/`) are the source of truth; code follows them.
 They give the agent persistent context across sessions and make decisions reviewable.
 
+## SDD workflow (end to end)
+🧹 = clear context · ⏸ = keep context
+1. **Constitution** — mission, tech stack, roadmap (tiny phases). Commit.
+   🧹 after commit: everything now lives on disk.
+2. **Pick next phase** — from the roadmap; create one branch per phase.
+   ⏸ go straight into the spec.
+3. **Feature spec** — dated dir in `specs/`: `requirements.md` (scope, decisions, context),
+   `plan.md` (numbered task groups), `validation.md` (merge bar). Ask before writing.
+   ⏸ the reasons behind the answers are still fresh for the review.
+4. **Review the spec** — highest-leverage moment: fix ambiguity, hidden assumptions,
+   untestable checks, scope creep. Commit the spec before any code.
+   🧹 after commit: implementation must work from the spec alone.
+5. **Implement** — one task group at a time; check, commit, repeat.
+   ⏸ while fixing failures inside a group · 🧹 between groups, after commit.
+6. **Validate** — run `validation.md`; fix gaps in the same session.
+   🧹 before: a fresh reviewer has no bias from the session that wrote the code · ⏸ while fixing.
+7. **Merge** — PR shows spec + code; CI green → merge to `main`.
+8. **Update & repeat** — mark the phase done in the roadmap, amend specs if reality
+   changed, commit.
+   🧹 then go to step 2.
+
 ## Constitution = project-wide, long-lived specs
 - `mission.md` — why / for whom → resolves ambiguous choices
 - `tech-stack.md` — built with what → keeps the stack consistent
