@@ -3,7 +3,9 @@
 Each phase is one user-visible slice, built end to end and mergeable on its own.
 Phases run in order, and each one gets its own feature spec before implementation.
 
-## Phase 1: Hello Hono
+## Phase 1: Hello Hono — ✅ Done
+
+Spec: [`2026-10-09-hello-hono`](./2026-10-09-hello-hono/)
 
 - Hono server running on Node with TypeScript
 - Shared layout (header, footer, base styles)
