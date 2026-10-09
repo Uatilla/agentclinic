@@ -33,6 +33,11 @@ describe('GET /', () => {
     }
   })
 
+  test('sets the viewport for responsive design', async () => {
+    const html = await (await get()).text()
+    expect(html).toContain('<meta name="viewport" content="width=device-width, initial-scale=1"/>')
+  })
+
   test('links the stylesheet', async () => {
     const html = await (await get()).text()
     expect(html).toContain('<link rel="stylesheet" href="/public/styles.css"/>')

@@ -10,6 +10,9 @@ Guided by [`mission.md`](../mission.md) (playful but polished; tested and CI-gre
 and [`tech-stack.md`](../tech-stack.md) (TypeScript strict, Node LTS, Hono, Hono JSX, Vitest,
 GitHub Actions).
 
+> **Amended 2026-10-09:** responsive design added as a product-wide requirement
+> ([`mission.md`](../mission.md), [`tech-stack.md`](../tech-stack.md)).
+
 ## Scope
 
 ### In
@@ -20,6 +23,9 @@ GitHub Actions).
 - Shared layout component (Hono JSX): header with the AgentClinic name, `<main>` content slot,
   footer.
 - Base styles in a plain CSS file served as a static asset.
+- Responsive design, per [`tech-stack.md`](../tech-stack.md): mobile-first styles, fluid
+  layout, and no horizontal scroll from 320px up. Teaser cards stack in one column on phones
+  and sit side by side on wider screens.
 - Home page at `/`:
   - Hero: playful headline and tagline that tells the premise (agents come in with ailments,
     leave with therapies). Tone reference (not final copy):
@@ -48,9 +54,11 @@ GitHub Actions).
 | Runtime | `tsx` for `dev` (watch) and `start`; `tsc` only type-checks (`noEmit`) | No build step or `dist/`; avoids `.js` import extensions NodeNext would need when emitting |
 | Styles | Single `public/styles.css` served via `serveStatic` | Simple, modern CSS, no build tooling |
 | Teaser cards | Not links; marked "coming soon" | No dead links to routes that don't exist yet |
+| Responsive layout | Mobile-first CSS; card grid with `repeat(auto-fit, minmax(min(16rem, 100%), 1fr))` | Cards reflow from 1 to 3 columns with no media queries, and `min()` keeps them from overflowing narrow screens |
 | Node version | **Node 24** (Active LTS), pinned in `.nvmrc`, `engines` in `package.json`, read by CI | One explicit, supported version locally and in CI |
 | Tests location | Colocated: `src/**/*.test.ts(x)` next to the code under test | Easy to find; moves with the code |
 | CI trigger | `push` to `main` + `pull_request` | Avoids running twice on PR branches |
+| Validation | Automated checks in `validation.md` are Vitest tests; `npm run validate` runs type-check + tests | One command shows whether the phase meets its merge bar ([`tech-stack.md`](../tech-stack.md)) |
 | Task order | Tooling + CI first, then features | CI guards every later task group |
 
 ## Scripts (expected)
@@ -59,3 +67,4 @@ GitHub Actions).
 - `start` — `tsx src/index.ts`
 - `typecheck` — `tsc --noEmit`
 - `test` — `vitest run`
+- `validate` — `npm run typecheck && npm test`

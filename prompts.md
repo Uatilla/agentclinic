@@ -30,6 +30,12 @@ They give the agent persistent context across sessions and make decisions review
 - `tech-stack.md` — built with what → keeps the stack consistent
 - `roadmap.md` — in what order → very small phases (small spec, small diff, easy review)
 
+### Changing the constitution
+- Default: own branch (from `main`) and own PR, because it guides every future phase,
+  deserves its own review, and stays visible in history.
+- Exception: if the feature depends on the change, ship both in the same PR (or merge the
+  constitution first, then rebase), so code never breaks a rule `main` doesn't have yet.
+
 ## Prompt pattern
 > Give context (one-line intent + where the requirements live).
 > Create a constitution in `specs/`: mission, tech-stack, roadmap (very small phases).
