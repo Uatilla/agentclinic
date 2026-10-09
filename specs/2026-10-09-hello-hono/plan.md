@@ -35,12 +35,19 @@ Every group must leave the repo working.
 
 ## 4. Shared layout + base styles
 
-1. Create `src/components/Layout.tsx`: `<html lang="en">`, `<head>` with title, viewport meta
-   and stylesheet link; `<header>`, `<main>`, `<footer>`.
+1. Create the layout as a main component composed of three subcomponents in `src/components/`:
+   - `Header.tsx`: `<header>` with the AgentClinic brand.
+   - `Main.tsx`: `<main>` wrapping the page content (`children`).
+   - `Footer.tsx`: `<footer>` with the footer note.
+   - `Layout.tsx`: `<!DOCTYPE html>`, `<html lang="en">`, `<head>` with title, viewport meta
+     and stylesheet link; `<body>` renders `<Header />`, `<Main>{children}</Main>`, `<Footer />`.
 2. Create `public/styles.css` with base styles (typography, colors, layout, cards).
-3. Serve `/public/*` via `serveStatic` from `@hono/node-server/serve-static`.
+3. Serve `/public/*` via `serveStatic` from `@hono/node-server/serve-static`, and link the
+   stylesheet from `Layout`'s `<head>` (`<link rel="stylesheet" href="/public/styles.css">`).
+   CSS is linked, not imported into TSX: without a bundler, Node can't import `.css` modules.
 
-**Check:** the page renders inside the layout; `/public/styles.css` returns 200.
+**Check:** the page renders inside the layout with header, main and footer; `/public/styles.css`
+returns 200; the HTML links the stylesheet.
 
 ## 5. Home page
 
