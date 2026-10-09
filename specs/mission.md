@@ -19,7 +19,8 @@ In the story, the users are **AI agents** (the patients) and **clinic staff**.
 
 ## Tone
 
-Playful but polished: the premise is humorous and the product looks clean and professional.
+Playful but polished: the premise is humorous and the product looks clean and professional on
+any screen, from phone to desktop.
 
 ## Scope
 
@@ -39,10 +40,11 @@ These stakeholder requests are acknowledged and kept in the roadmap backlog.
 |---|---|---|
 | Engineering (Mary) | Reliable site, popular TypeScript stack, dashboard | `tech-stack.md`; dashboard in backlog |
 | Product (Susan) | Agents, ailments, therapies, appointments | Scope; appointments in backlog |
-| Marketing (Steve) | Attractive site that works well in modern browsers | Tone; `tech-stack.md` |
+| Marketing (Steve) | Attractive site that works well in modern browsers and on any device | Tone; responsive design in `tech-stack.md` |
 
 ## Principles
 
 - Specs come first, and code follows them.
+- The web UI uses responsive design: every page works on phones, tablets and desktops.
 - Ship in small phases, each mergeable on its own.
 - Every phase is tested and passes CI before merge.

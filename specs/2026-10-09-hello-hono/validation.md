@@ -13,6 +13,8 @@ The phase can merge to `main` when every box below is checked.
   - [x] The response contains the Agents, Ailments and Therapies teaser cards.
   - [x] Accessibility baseline: `<html lang="en">`, exactly one `<h1>`, and `<header>`,
         `<main>`, `<footer>` landmarks.
+  - [x] Responsive baseline: the page has the viewport meta tag
+        (`width=device-width, initial-scale=1`).
   - [x] The page links `/public/styles.css`, which returns 200 with `text/css`.
   - [x] Scope guard: no `<script>` tag (no client-side JavaScript) and no `<a>` links
         (no links to routes that don't exist yet).
@@ -29,7 +31,11 @@ The phase can merge to `main` when every box below is checked.
 - [x] In a current evergreen browser, the page shows the header, hero, three teaser cards and
       footer, with styles applied.
 - [x] The copy matches the tone reference in `requirements.md` (playful but polished).
-- [x] No horizontal scroll at 375px viewport width (browser dev tools).
+- [ ] Responsive (browser dev tools), at each reference width from `tech-stack.md`:
+  - [ ] 320px: no horizontal scroll; teaser cards stack in one column; text readable without
+        zooming.
+  - [ ] 768px: layout uses the extra width (cards reflow), nothing overflows.
+  - [ ] 1280px: content is centered within the max width; cards sit side by side.
 
 ## Scope guard
 

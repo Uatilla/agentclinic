@@ -16,6 +16,19 @@
 - Minimal client-side JavaScript; add it only when a feature needs it.
 - Semantic HTML and modern CSS, targeting current evergreen browsers.
 
+## Responsive design
+
+Every page in the web UI is responsive:
+
+- **Mobile-first CSS:** base styles target small screens, and `min-width` media queries in `rem`
+  add layout for larger ones.
+- **Fluid layout:** use CSS Grid/Flexbox, relative units, and `min()`/`clamp()` instead of fixed
+  pixel widths. Media (images, video) never overflows its container.
+- **Viewport meta tag** (`width=device-width, initial-scale=1`) in the shared layout.
+- **Supported widths:** from 320px up, with no horizontal scroll and readable text without
+  zooming. Reference widths for checks: 320px (small phone), 768px (tablet), 1280px (desktop).
+- **Touch-friendly:** interactive elements are at least 44×44px.
+
 ## Data
 
 - **SQLite** as the database.

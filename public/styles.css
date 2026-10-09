@@ -37,6 +37,14 @@ body {
   color: var(--text);
   font-family: var(--font);
   line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
 }
 
 main {
@@ -74,8 +82,14 @@ main {
 }
 
 .hero {
-  padding: 4rem 0 2rem;
+  padding: 2.5rem 0 1.5rem;
   text-align: center;
+}
+
+@media (min-width: 40rem) {
+  .hero {
+    padding: 4rem 0 2rem;
+  }
 }
 
 .hero h1 {
@@ -86,14 +100,14 @@ main {
 
 .hero p {
   color: var(--muted);
-  font-size: 1.125rem;
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
   max-width: 40rem;
   margin: 0 auto;
 }
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
   gap: 1.25rem;
   padding: 2rem 0;
   margin: 0;

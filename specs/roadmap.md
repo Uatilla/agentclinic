@@ -2,13 +2,15 @@
 
 Each phase is one user-visible slice, built end to end and mergeable on its own.
 Phases run in order, and each one gets its own feature spec before implementation.
+Every phase that adds or changes UI keeps it responsive (see [`tech-stack.md`](./tech-stack.md)),
+and its validation checks the reference widths.
 
 ## Phase 1: Hello Hono — ✅ Done
 
 Spec: [`2026-10-09-hello-hono`](./2026-10-09-hello-hono/)
 
 - Hono server running on Node with TypeScript
-- Shared layout (header, footer, base styles)
+- Shared layout (header, footer, base styles), responsive and mobile-first
 - Minimal AgentClinic home page
 - First Vitest test for the home route
 - GitHub Actions CI (type-check + tests)

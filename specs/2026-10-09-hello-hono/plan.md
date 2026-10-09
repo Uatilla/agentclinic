@@ -42,13 +42,15 @@ Every group must leave the repo working.
    - `Footer.tsx`: `<footer>` with the footer note.
    - `Layout.tsx`: `<!DOCTYPE html>`, `<html lang="en">`, `<head>` with title, viewport meta
      and stylesheet link; `<body>` renders `<Header />`, `<Main>{children}</Main>`, `<Footer />`.
-2. Create `public/styles.css` with base styles (typography, colors, layout, cards).
+2. Create `public/styles.css` with mobile-first base styles (typography, colors, layout,
+   cards): fluid widths, `clamp()` for type, a card grid that reflows without overflow, and
+   `min-width` media queries only where larger screens need more room.
 3. Serve `/public/*` via `serveStatic` from `@hono/node-server/serve-static`, and link the
    stylesheet from `Layout`'s `<head>` (`<link rel="stylesheet" href="/public/styles.css">`).
    CSS is linked, not imported into TSX: without a bundler, Node can't import `.css` modules.
 
 **Check:** the page renders inside the layout with header, main and footer; `/public/styles.css`
-returns 200; the HTML links the stylesheet.
+returns 200; the HTML links the stylesheet; the page has no horizontal scroll at 320px.
 
 ## 5. Home page
 
@@ -56,6 +58,7 @@ returns 200; the HTML links the stylesheet.
    Ailments, Therapies) marked "coming soon".
 2. Wire `/` to render `Home` inside `Layout`.
 3. Expand `src/app.test.tsx` to cover every automated check in `validation.md`
-   (status, content type, content, accessibility baseline, stylesheet, scope guards).
+   (status, content type, content, accessibility baseline, viewport meta, stylesheet, scope
+   guards).
 
 **Check:** `npm run validate` passes, then the manual checks in [`validation.md`](./validation.md).
