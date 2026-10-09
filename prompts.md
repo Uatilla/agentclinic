@@ -21,8 +21,7 @@ They give the agent persistent context across sessions and make decisions review
 6. **Validate** — run `validation.md`; fix gaps in the same session.
    🧹 before: a fresh reviewer has no bias from the session that wrote the code · ⏸ while fixing.
 7. **Merge** — PR shows spec + code; CI green → merge to `main`.
-8. **Update & repeat** — mark the phase done in the roadmap, amend specs if reality
-   changed, commit.
+8. **Update & replan** — mark the phase done in the roadmap, then replan (see below), commit.
    🧹 then go to step 2.
 
 ## Constitution = project-wide, long-lived specs
@@ -35,6 +34,14 @@ They give the agent persistent context across sessions and make decisions review
   deserves its own review, and stays visible in history.
 - Exception: if the feature depends on the change, ship both in the same PR (or merge the
   constitution first, then rebase), so code never breaks a rule `main` doesn't have yet.
+
+### Replanning between phases
+- Replan after every merge, before the next spec: lessons from the last phase reshape the next.
+- Keep it short: what changes the next phase? Adjust scope, split/merge/reorder phases;
+  touch mission/tech stack only if a rule changed. "Roadmap still holds" is a valid outcome.
+- Commit the replan on its own, so it shows up in history.
+- Pitfalls: churn (rewriting everything), scope creep (new ideas go to the backlog),
+  replanning mid-phase (instead, amend that phase's spec with a dated note).
 
 ## Prompt pattern
 > Give context (one-line intent + where the requirements live).
