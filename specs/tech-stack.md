@@ -25,6 +25,10 @@
 ## Quality
 
 - **Vitest** for unit and integration tests (route tests use Hono's `app.request()`).
+- **Validation is automated with Vitest**: every behavior check in a phase's `validation.md`
+  (routes, content, accessibility, scope guards) is backed by a Vitest test; only judgment calls
+  (look, tone, layout in a browser) stay manual. `npm run validate` (type-check + tests) is the
+  single command that shows whether a phase meets its automated merge bar.
 - **GitHub Actions CI** runs type-checking and tests on every push and pull request.
 
 ## Conventions

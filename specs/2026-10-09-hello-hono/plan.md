@@ -11,7 +11,8 @@ Every group must leave the repo working.
 3. Update `tsconfig.json`: modern `target`, `module`/`moduleResolution: NodeNext`,
    `jsx: react-jsx`, `jsxImportSource: hono/jsx`, `noEmit: true`, keep `strict`.
 4. Install deps: `hono`, `@hono/node-server`; dev deps: `tsx`, `vitest`, `@types/node` (v24).
-5. Add scripts: `dev` (`tsx watch`), `start` (`tsx`), `typecheck`, `test`.
+5. Add scripts: `dev` (`tsx watch`), `start` (`tsx`), `typecheck`, `test`, and `validate`
+   (`typecheck` + `test`).
 
 **Check:** `npm run typecheck` passes.
 
@@ -54,7 +55,7 @@ returns 200; the HTML links the stylesheet.
 1. Create `src/pages/Home.tsx`: hero (headline + tagline) and three teaser cards (Agents,
    Ailments, Therapies) marked "coming soon".
 2. Wire `/` to render `Home` inside `Layout`.
-3. Expand `src/app.test.tsx` to cover every automated assertion in `validation.md`
-   (status, content type, content, accessibility baseline, no `<script>`).
+3. Expand `src/app.test.tsx` to cover every automated check in `validation.md`
+   (status, content type, content, accessibility baseline, stylesheet, scope guards).
 
-**Check:** everything in [`validation.md`](./validation.md) passes.
+**Check:** `npm run validate` passes, then the manual checks in [`validation.md`](./validation.md).
