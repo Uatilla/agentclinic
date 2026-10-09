@@ -19,6 +19,14 @@ They give the agent persistent context across sessions and make decisions review
 - **Refine with small follow-ups**, editing the spec rather than the code
   (e.g. "add a target audience to the mission", "add SQLite to the tech stack").
 
+## When to clear context
+Rule: clear when the next step can be fully described by files on disk.
+- ✅ Between steps: constitution → feature spec → implement → validate → next feature.
+- ✅ Before validation: a fresh context reviews without bias from the session that wrote the code.
+- ❌ For small fixes within a feature: stay in the session, since the failure details are already in context.
+- 🔄 For a change of direction: update the spec, commit, then clear.
+- Never clear with uncommitted work or decisions that exist only in the chat.
+
 ## Takeaways
 - Spec first, code second; change the spec before the code.
 - Keep phases tiny.
