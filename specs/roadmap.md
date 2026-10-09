@@ -15,32 +15,21 @@ Spec: [`2026-10-09-hello-hono`](./2026-10-09-hello-hono/)
 - First Vitest test for the home route
 - GitHub Actions CI (type-check + tests)
 
-## Phase 2: List agents
+## Phase 2: Agents & ailments
 
-- SQLite + Drizzle set up: `agents` schema, migration, seed data
+- SQLite + Drizzle set up: `agents` and `ailments` schemas, plus the link between them;
+  migrations and seed data
 - `/agents` page listing agents
-
-## Phase 3: Agent detail
-
-- `/agents/:id` page showing an agent's profile
+- `/agents/:id` page showing an agent's profile and their ailments
 - 404 page for unknown agents
-
-## Phase 4: Ailments catalog
-
-- `ailments` schema + seed data
 - `/ailments` page listing ailments
 
-## Phase 5: Agents ↔ ailments
-
-- Link agents to their ailments
-- Agent detail page shows the agent's ailments
-
-## Phase 6: Therapies catalog
+## Phase 3: Therapies catalog
 
 - `therapies` schema + seed data
 - `/therapies` page listing therapies
 
-## Phase 7: Therapies ↔ ailments
+## Phase 4: Therapies ↔ ailments
 
 - Match therapies to ailments
 - Ailment and agent pages show recommended therapies
