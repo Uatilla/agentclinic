@@ -5,21 +5,22 @@ Every group must leave the repo working.
 
 ## 1. Project configuration
 
-1. Add `"type": "module"` to `package.json`.
-2. Update `tsconfig.json`: modern `target`, `module`/`moduleResolution: NodeNext`,
-   `jsx: react-jsx`, `jsxImportSource: hono/jsx`, keep `strict`.
-3. Install deps: `hono`, `@hono/node-server`; dev deps: `tsx`, `vitest`, `@types/node`.
-4. Add `.nvmrc` with the current Node LTS.
-5. Add scripts: `dev`, `start`, `typecheck`, `test`.
-6. Ignore `dist/` in `.gitignore`.
+1. Install and use Node 24 locally (`nvm install 24`); add `.nvmrc` (`24`) and
+   `"engines": { "node": ">=24" }`.
+2. In `package.json`: add `"type": "module"`; remove `main` and the `build` script.
+3. Update `tsconfig.json`: modern `target`, `module`/`moduleResolution: NodeNext`,
+   `jsx: react-jsx`, `jsxImportSource: hono/jsx`, `noEmit: true`, keep `strict`.
+4. Install deps: `hono`, `@hono/node-server`; dev deps: `tsx`, `vitest`, `@types/node` (v24).
+5. Add scripts: `dev` (`tsx watch`), `start` (`tsx`), `typecheck`, `test`.
 
 **Check:** `npm run typecheck` passes.
 
 ## 2. Test harness + CI
 
-1. Add Vitest config (if needed) and a trivial passing test.
+1. Add Vitest config (if needed, include `src/**/*.test.{ts,tsx}`) and a trivial passing
+   test in `src/`.
 2. Add `.github/workflows/ci.yml`: checkout, setup Node from `.nvmrc` with npm cache,
-   `npm ci`, `npm run typecheck`, `npm test`. Trigger on push and pull_request.
+   `npm ci`, `npm run typecheck`, `npm test`. Trigger on `push` to `main` and `pull_request`.
 
 **Check:** `npm test` passes locally; CI runs green after pushing the branch.
 
@@ -28,7 +29,7 @@ Every group must leave the repo working.
 1. Create `src/app.tsx` exporting the Hono `app`.
 2. Replace `src/index.ts` with server startup via `@hono/node-server` (port from `PORT`,
    default 3000).
-3. Replace the trivial test with a route test using `app.request('/')`.
+3. Replace the trivial test with `src/app.test.tsx`, a route test using `app.request('/')`.
 
 **Check:** `npm run dev` serves `/`; tests pass.
 
@@ -46,7 +47,7 @@ Every group must leave the repo working.
 1. Create `src/pages/Home.tsx`: hero (headline + tagline) and three teaser cards (Agents,
    Ailments, Therapies) marked "coming soon".
 2. Wire `/` to render `Home` inside `Layout`.
-3. Expand the home route test: 200 status, HTML content type, AgentClinic heading, all three
-   teaser cards present.
+3. Expand `src/app.test.tsx` to cover every automated assertion in `validation.md`
+   (status, content type, content, accessibility baseline, no `<script>`).
 
 **Check:** everything in [`validation.md`](./validation.md) passes.

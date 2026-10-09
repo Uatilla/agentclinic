@@ -9,21 +9,25 @@ The phase can merge to `main` when every box below is checked.
 - [ ] `npm test` passes.
 - [ ] The home route test asserts:
   - [ ] `GET /` returns status 200.
-  - [ ] The `Content-Type` is `text/html`.
+  - [ ] The `Content-Type` starts with `text/html`.
   - [ ] The response contains the AgentClinic heading.
   - [ ] The response contains the Agents, Ailments and Therapies teaser cards.
-- [ ] The GitHub Actions CI workflow runs on the PR and is green.
+  - [ ] Accessibility baseline: `<html lang="en">`, exactly one `<h1>`, and `<header>`,
+        `<main>`, `<footer>` landmarks.
+  - [ ] No client-side JavaScript: the HTML contains no `<script>` tag.
+- [ ] The GitHub Actions CI workflow runs on the PR (Node 24) and is green.
 
 ## Manual
 
-- [ ] `npm run dev` starts the server; `http://localhost:3000` loads.
+- [ ] `node --version` is 24.x; `npm run dev` starts the server; `http://localhost:3000` loads.
 - [ ] In a current evergreen browser, the page shows the header, hero, three teaser cards and footer.
 - [ ] Styles load (no unstyled page; `/public/styles.css` returns 200).
-- [ ] The tone reads as playful but polished.
-- [ ] Layout holds up at mobile width (no horizontal scroll).
+- [ ] The copy matches the tone reference in `requirements.md` (playful but polished).
+- [ ] No horizontal scroll at 375px viewport width (browser dev tools).
 
 ## Scope guard
 
 - [ ] No database, Drizzle or seed code.
 - [ ] No links to routes that don't exist yet.
-- [ ] No client-side JavaScript.
+- [ ] No client-side JavaScript (also asserted by the route test).
+- [ ] No `dist/` or build step; tests live in `src/` next to the code.
