@@ -33,6 +33,11 @@ describe('GET /', () => {
     }
   })
 
+  test('links the stylesheet', async () => {
+    const html = await (await get()).text()
+    expect(html).toContain('<link rel="stylesheet" href="/public/styles.css"/>')
+  })
+
   test('ships no client-side JavaScript or links to missing routes', async () => {
     const html = await (await get()).text()
     expect(html).not.toMatch(/<script/i)

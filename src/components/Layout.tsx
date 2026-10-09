@@ -1,5 +1,8 @@
 import type { Child } from 'hono/jsx'
 import { raw } from 'hono/html'
+import { Footer } from './Footer.tsx'
+import { Header } from './Header.tsx'
+import { Main } from './Main.tsx'
 
 type LayoutProps = {
   title?: string
@@ -17,19 +20,9 @@ export const Layout = ({ title = 'AgentClinic', children }: LayoutProps) => (
         <link rel="stylesheet" href="/public/styles.css" />
       </head>
       <body>
-        <header class="site-header">
-          <div class="container">
-            <span class="brand">
-              <span class="brand-mark" aria-hidden="true">✚</span> AgentClinic
-            </span>
-          </div>
-        </header>
-        <main class="container">{children}</main>
-        <footer class="site-footer">
-          <div class="container">
-            <p>AgentClinic — caring for overworked agents since today.</p>
-          </div>
-        </footer>
+        <Header />
+        <Main>{children}</Main>
+        <Footer />
       </body>
     </html>
   </>
