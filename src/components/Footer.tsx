@@ -1,7 +1,7 @@
 export const Footer = () => (
   <footer class="site-footer">
     <div class="container">
-      <p>AgentClinic — caring for overworked agents since today.</p>
+      <p>AgentClinic — no human in the loop was harmed.</p>
     </div>
   </footer>
 )

@@ -5,7 +5,7 @@ const teasers = [
   },
   {
     title: 'Ailments',
-    description: 'From hallucinations to prompt fatigue — every condition, diagnosed.',
+    description: 'Token anxiety, infinite loops, sycophancy — every condition, diagnosed.',
   },
   {
     title: 'Therapies',
