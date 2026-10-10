@@ -29,8 +29,8 @@ The MVP can merge to `main` when every box below is checked.
   - [ ] `GET /ailments/:id` returns 200 with the ailment, its therapies (high → low) and its
         affected agents with severity, all linked.
   - [ ] `GET /ailments` cards link to `/ailments/:id`.
-  - [ ] `GET /agents/:id` links each ailment to `/ailments/:id` and lists its recommended
-        therapies.
+  - [ ] `GET /agents/:id` links each ailment to `/ailments/:id` and lists all its therapies,
+        high → low effectiveness.
   - [ ] Empty states: an ailment with no therapies shows "No known cure — yet."; a therapy with
         no ailments shows its empty-state text.
   - [ ] `GET /therapies/9999`, `/therapies/abc`, `/ailments/9999` and `/ailments/abc` return 404
@@ -59,12 +59,14 @@ The MVP can merge to `main` when every box below is checked.
 - [ ] Contrast (WCAG AA, 4.5:1) checked for each effectiveness badge in light and dark mode.
 - [ ] Seed therapies and empty-state copy match the tone (playful but polished).
 - [ ] Responsive at each reference width, on every new or changed page:
-  - [ ] 320px: no horizontal scroll; header nav with four links fits without overflow; agent
+  - [ ] 320px: no horizontal scroll; header nav with four links wraps without overflow; agent
         profile recommendations stay readable.
   - [ ] 768px: layout uses the extra width; nothing overflows.
   - [ ] 1280px: content centered within the max width.
   - [ ] Nav links, cards and therapy links are at least 44×44px touch targets.
 - [ ] README, roadmap and tech-stack reflect the MVP.
+- [ ] `CHANGELOG.md` has an entry for the MVP.
+- [ ] `prompts.md` has concise, reusable SDD lessons from this MVP.
 
 ## Scope guard
 
