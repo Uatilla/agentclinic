@@ -4,6 +4,9 @@ All notable changes to this project, newest first.
 
 ## 2026-10-10
 
+- Shipped the MVP (Phases 3–4): every validation check passed, including the author's
+  browser walkthrough, look and tone checks, CI was green on the pull request, and it was
+  merged to `main` with the roadmap marked done.
 - Wrote the MVP feature spec, combining roadmap Phases 3 and 4 (therapies catalog and matching)
   on one branch with a checkpoint between them, then amended it after a pre-build review:
   therapy–ailment data appears only once it exists, agent profiles list every therapy per
