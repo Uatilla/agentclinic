@@ -4,6 +4,9 @@ import { Hono } from 'hono'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Layout } from './components/Layout.tsx'
 import type { Db } from './db/client.ts'
+import { listAgents, listAilmentsWithCounts } from './db/queries.ts'
+import { Agents } from './pages/Agents.tsx'
+import { Ailments } from './pages/Ailments.tsx'
 import { Home } from './pages/Home.tsx'
 
 // Resolved from this module, not the working directory, so styles load wherever the server starts
@@ -21,6 +24,22 @@ export const createApp = (db: Db) => {
     c.html(
       <Layout>
         <Home />
+      </Layout>,
+    ),
+  )
+
+  app.get('/agents', (c) =>
+    c.html(
+      <Layout title="Agents · AgentClinic">
+        <Agents agents={listAgents(db)} />
+      </Layout>,
+    ),
+  )
+
+  app.get('/ailments', (c) =>
+    c.html(
+      <Layout title="Ailments · AgentClinic">
+        <Ailments ailments={listAilmentsWithCounts(db)} />
       </Layout>,
     ),
   )

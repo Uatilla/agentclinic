@@ -1,9 +1,17 @@
 import { describe, expect, test } from 'vitest'
 import * as appModule from './app.tsx'
+import { listAilmentsWithCounts } from './db/queries.ts'
+import { seedAgents, seedAilments } from './db/seed.ts'
 import { createTestDb } from './db/test-db.ts'
-import { expectedStylesheets, stylesheetHrefs } from './test-utils.ts'
+import {
+  expectedStylesheets,
+  expectPageBaseline,
+  linkHrefs,
+  stylesheetHrefs,
+} from './test-utils.ts'
 
-const app = appModule.createApp(createTestDb())
+const db = createTestDb()
+const app = appModule.createApp(db)
 
 test('the app module only exports createApp, so importing it opens no database', () => {
   expect(Object.keys(appModule)).toEqual(['createApp'])
@@ -56,6 +64,62 @@ describe('GET /', () => {
     const html = await (await get()).text()
     expect(html).not.toMatch(/<script/i)
     expect(html).not.toMatch(/<a\s/i)
+  })
+})
+
+describe('GET /agents', () => {
+  const get = () => app.request('/agents')
+
+  test('returns 200 with HTML', async () => {
+    const res = await get()
+    expect(res.status).toBe(200)
+    expect(res.headers.get('content-type')).toMatch(/^text\/html/)
+  })
+
+  test('meets the page baseline', async () => {
+    expectPageBaseline(await (await get()).text())
+  })
+
+  test('lists every seeded agent with their model, linking to their profile', async () => {
+    const html = await (await get()).text()
+    for (const { id, name, model } of seedAgents) {
+      expect(html).toContain(`<a href="/agents/${id}">${name}</a>`)
+      expect(html).toContain(model)
+    }
+    const profileLinks = linkHrefs(html).filter((href) => href.startsWith('/agents/'))
+    expect(profileLinks).toHaveLength(seedAgents.length)
+  })
+})
+
+describe('GET /ailments', () => {
+  const get = () => app.request('/ailments')
+
+  test('returns 200 with HTML', async () => {
+    const res = await get()
+    expect(res.status).toBe(200)
+    expect(res.headers.get('content-type')).toMatch(/^text\/html/)
+  })
+
+  test('meets the page baseline', async () => {
+    expectPageBaseline(await (await get()).text())
+  })
+
+  test('lists every seeded ailment with its description', async () => {
+    const html = await (await get()).text()
+    for (const { name, description } of seedAilments) {
+      expect(html).toContain(`<h2>${name}</h2>`)
+      expect(html).toContain(description)
+    }
+  })
+
+  test('shows how many agents have each ailment', async () => {
+    const html = await (await get()).text()
+    const cards = html.split('<article').slice(1)
+    for (const { name, agentCount } of listAilmentsWithCounts(db)) {
+      const card = cards.find((card) => card.includes(`<h2>${name}</h2>`))
+      const label = `${agentCount} ${agentCount === 1 ? 'agent' : 'agents'} affected`
+      expect(card, name).toContain(label)
+    }
   })
 })
 

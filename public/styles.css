@@ -122,6 +122,20 @@ body > main {
   margin-inline: auto;
 }
 
+/* Page intro (list pages) */
+.page-intro {
+  padding: 1.5rem 0 0.5rem;
+}
+
+.page-intro h1 {
+  font-size: clamp(1.75rem, 5vw, 36px);
+  margin-bottom: 0.5rem;
+}
+
+.page-intro p {
+  color: var(--pico-muted-color);
+}
+
 /* Card grid: reflows 1 → 2 → 3 columns (Pico's .grid jumps from 1 to all columns) */
 .cards {
   display: grid;
@@ -166,4 +180,22 @@ body > main {
 .cards .badge {
   margin-top: auto;
   align-self: flex-start;
+}
+
+/* Linked cards: the title link stretches over the whole card, a large touch target
+   with no JavaScript */
+.card-linked {
+  position: relative;
+}
+
+.card-linked a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.card-linked:hover,
+.card-linked:focus-within {
+  box-shadow: 0 0 0 2px var(--pico-primary);
 }
