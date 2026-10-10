@@ -46,5 +46,6 @@ These stakeholder requests are acknowledged and kept in the roadmap backlog.
 
 - Specs come first, and code follows them.
 - The web UI uses responsive design: every page works on phones, tablets and desktops.
-- Ship in small phases, each mergeable on its own.
+- Ship in small phases, each mergeable on its own. A milestone may group consecutive phases on
+  one branch, with a checkpoint after each phase.
 - Every phase is tested and passes CI before merge.

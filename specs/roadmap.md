@@ -28,7 +28,7 @@ Spec: [`2026-10-10-agents-ailments`](./2026-10-10-agents-ailments/)
 - `/ailments` page listing ailments
 - Header nav (Home, Agents, Ailments); home cards link to the new pages
 
-## MVP: Phases 3 and 4 — ✅ Done
+## MVP: Phases 3 and 4 — 🔍 In review (PR #2)
 
 Spec: [`2026-10-10-mvp`](./2026-10-10-mvp/) (one branch and spec for both phases, built in
 phase order with a checkpoint between them)

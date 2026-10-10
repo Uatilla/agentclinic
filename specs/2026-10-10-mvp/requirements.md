@@ -22,6 +22,14 @@ badges, page baseline) carry over unless changed here.
 > therapy↔ailment info appears only once the link table exists (no zeros at the Phase 3
 > checkpoint); agent profiles list every therapy per ailment, best first; the header may wrap
 > taller at 320px with four links; close-out includes the changelog, study notes and a pushed PR.
+>
+> **Amended 2026-10-10 (after the branch review, group 8):** a three-angle review (spec
+> conformance, code and tests, UX and accessibility) found no bugs but showed that ratings
+> were hard to read on agent profiles. Severity moves to a warm color scale so it no longer
+> looks like effectiveness; badges say what they measure; profile therapy lists get a visible
+> label; badges stay next to their names; the 404 page links every section; the therapy
+> duration is labelled; extra empty states are recorded; shared row and badge components
+> replace four copies; the roadmap waits for the merge before saying "done".
 
 ## Scope
 
@@ -77,13 +85,18 @@ badges, page baseline) carry over unless changed here.
 | Agent profile recommendations | Every therapy for each ailment, best first, as compact links with effectiveness badges; a therapy may appear under two ailments | Seed has 1–3 therapies per ailment, so lists stay short; per-ailment grouping explains *why* each therapy is there |
 | Low effectiveness | Still listed, ranked last, with its "Low" label | Honest and on-tone; the label carries the meaning |
 | Phase 3 checkpoint content | Groups 2–3 show only therapy name, description and duration; ailment counts and lists arrive with `therapy_ailments` in groups 4–5 | No page shows placeholder zeros or empty states caused by unbuilt work |
-| Effectiveness badges | Graded like severity (low neutral, medium teal tint, high solid teal), text label always shown, at least 4.5:1 contrast | One visual language for ratings; color is never the only signal |
-| Ailment with no therapies | Shows "No known cure — yet." (the seed never hits it; tested with an extra row) | Every page has an empty state that fits the tone |
-| Therapy with no ailments | Shows "Treats nothing in particular. Feels great, though." | Same as above |
+| Effectiveness badges | Teal scale (low neutral, medium teal tint, high solid teal), text label always shown, at least 4.5:1 contrast | Good news uses the brand color; color is never the only signal |
+| Empty states | Ailment page with no therapies, and an ailment on a profile with none: "No known cure — yet." Ailment with no agents: "No agents affected — for now." Therapy with no ailments: "Treats nothing in particular. Feels great, though." on its page, "Treats nothing in particular" on its card. The seed never hits them; tests add rows | Every list has an empty state that fits the tone |
 | Migration | One new drizzle-kit migration per phase half (`therapies`, then `therapy_ailments`) | Schema history follows the plan order and stays reviewable |
 | Route ids | `/therapies/:id{[0-9]+}`, `/ailments/:id{[0-9]+}`, same as `/agents/:id` | One pattern for every detail page |
 | Current page in nav | `/therapies/…` marks Therapies, `/ailments/…` marks Ailments; 404/500 mark nothing | Same rule as Phase 2 |
 | Scope guards | Phase 2's "no `therapies` table" and "no `/therapies` route" guards are replaced by booking/dashboard/write-route guards | Those guards are now wrong on purpose; the new ones keep the backlog out |
-| Queries | New functions in `src/db/queries.ts`, plain data out. Group 2: `listTherapies`, `getTherapy`. Group 4 extends them to `listTherapiesWithCounts` and `getTherapyWithAilments`, adds `getAilmentDetail`, and `getAgentWithAilments` adds each ailment's therapies | Pages stay independent of Drizzle and easy to test; each query only exposes data that exists |
+| Queries | Plain data out from `src/db/queries.ts`: `listTherapiesWithCounts`, `getTherapyWithAilments`, `getAilmentWithTherapiesAndAgents`; `getAgentWithAilments` adds each ailment's therapies. Sort ranks are built from the enum arrays in `schema.ts`. (Groups 2–3 used `listTherapies`/`getTherapy`; group 4 renamed and extended them) | Pages stay independent of Drizzle; adding an enum value can't silently mis-rank |
 | Header at 320px | With four nav links the nav may wrap to two rows; the header stays left-aligned with no overflow (Phase 2's ~100px height becomes a guide, not a limit) | Four touch-friendly links don't fit one row at 320px |
-| Components | New cards and badges reuse `TeaserCard`/card-grid patterns, each with an extracted `type FooProps` | Per [`tech-stack.md`](../tech-stack.md) conventions |
+| Components | One `RatedLink` row (link plus badge) and one `Badge` component serve every detail list; `SeverityBadge` and `EffectivenessBadge` are thin wrappers. Detail lists use a neutral `.detail-list` class, styled through direct children only. Every props type is a named `type FooProps` | One markup pattern instead of four copies; nested lists can't inherit row styles by accident |
+| Severity badges | Warm scale replacing Phase 2's teal one: mild neutral, moderate amber tint (light `#fbecd0`/`#8a4b00`, dark `#3d2b12`/`#f0b85c`), severe solid red-brown (light `#a8402b`/white, dark `#e8826a`/`#2a0e07`); all at least 4.5:1 | On a profile, severity (bad) and effectiveness (good) sit side by side; one scale made "Severe" and "High" look identical |
+| What a badge measures | Each badge carries a visually hidden prefix ("Severity: ", "Effectiveness: "), and lists say it visibly once: profile therapy lists open with a "Recommended therapies" label (also their accessible name via `aria-labelledby`) | "High" alone is ambiguous, for sighted and screen-reader users |
+| Badge placement | A badge follows its name on the same line; a long name wraps instead; detail lists are capped at `40rem` | Keeps name and rating together at 320px and avoids a 900px gap at 1280px |
+| 404 page | Links to Agents, Ailments and Therapies | A stale link to any section has a way back |
+| Therapy duration | Shown as "Duration: …"; the therapy list heading is "Ailments it treats" | Unlabelled values and terse headings read poorly, especially in heading navigation |
+| Unused code | `TeaserCard`'s "Coming soon" path is removed (`href` required) | Every home card links now; dead code misleads |

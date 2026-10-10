@@ -94,5 +94,23 @@ horizontal scroll at 320px.
 
 ### 8. Review fixes
 
-Filled in after the branch review, with an amendment note in
-[`requirements.md`](./requirements.md).
+Added after the three-angle branch review (see the second amendment note in
+[`requirements.md`](./requirements.md)).
+
+1. **Ratings:** warm severity scale; hidden "Severity: "/"Effectiveness: " prefixes; a
+   "Recommended therapies" label on each profile therapy list (`aria-labelledby`); badges
+   follow their names, lists capped at `40rem`.
+2. **Pages and copy:** 404 links all three sections; "Duration: …" and "Ailments it treats" on
+   therapy pages; "No agents affected — for now."
+3. **Code:** shared `Badge` and `RatedLink` components; `.detail-list` styled through direct
+   children; sort ranks built from the enum arrays; rename the ailment detail type and getter;
+   remove `TeaserCard`'s "Coming soon" path and unused exports.
+4. **Tests:** tie-break rows for "then name" ordering; zero-count therapy card; exact count
+   text; `1.5` ids and `POST /ailments` 404s; header nav on the 500 page; badge prefixes,
+   profile label, 404 links; drop the fixture-only and redundant profile tests; sort expected
+   values the way SQLite does.
+5. **Close-out:** evidence line for each ticked manual check; refresh test counts in the
+   changelog and PR; screenshots and measured contrast for the new colors.
+
+**Check:** `npm run validate` passes; screenshots at 320/768/1280 in light and dark; measured
+contrast for every badge pair.

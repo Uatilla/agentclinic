@@ -33,6 +33,16 @@ The MVP can merge to `main` when every box below is checked.
         high → low effectiveness.
   - [x] Empty states: an ailment with no therapies shows "No known cure — yet."; a therapy with
         no ailments shows its empty-state text.
+  - [ ] Every empty state in the requirements renders, including "No agents affected — for
+        now." and a zero-count therapy card ("Treats nothing in particular").
+  - [ ] Ties sort by name: therapies with the same effectiveness, and agents with the same
+        severity.
+  - [ ] Every badge has its hidden "Severity: " or "Effectiveness: " prefix; each profile
+        therapy list has a visible "Recommended therapies" label that names it.
+  - [ ] The 404 page links to `/agents`, `/ailments` and `/therapies`.
+  - [ ] Therapy pages show "Duration: …" and the heading "Ailments it treats".
+  - [ ] `/therapies/1.5` and `/ailments/1.5` return 404 too, and the 500 page has the header
+        nav.
   - [x] `GET /therapies/9999`, `/therapies/abc`, `/ailments/9999` and `/ailments/abc` return 404
         with the not-found page, marking no nav item.
   - [x] Header nav links to `/`, `/agents`, `/ailments` and `/therapies` on every page, and
@@ -43,6 +53,7 @@ The MVP can merge to `main` when every box below is checked.
       `<main>`, `<footer>`, viewport meta, stylesheets exactly Pico then `styles.css`, no
       `<script>`.
 - [x] Link integrity: every internal `href` on every page above returns 200.
+- [ ] Scope guard also covers `POST /ailments`.
 - [x] Scope guard: no booking or dashboard routes (`/appointments`, `/dashboard` → 404) and no
       write routes (`POST /therapies`, `POST /agents` → 404).
 - [x] The GitHub Actions CI workflow is green on the `mvp` → `main` pull request (Node 24).
@@ -57,6 +68,9 @@ The MVP can merge to `main` when every box below is checked.
       ailments → a recommended therapy → back to the ailment, using only links.
 - [ ] New pages look consistent with Phase 2 pages; effectiveness badges are readable in light
       and dark mode.
+- [ ] Contrast (WCAG AA, 4.5:1) measured for the warm severity badges in light and dark mode.
+- [ ] On an agent profile, severity and effectiveness badges are easy to tell apart, and each
+      badge stays next to its name at 320px and 1280px.
 - [x] Contrast (WCAG AA, 4.5:1) checked for each effectiveness badge in light and dark mode.
       (Computed from the CSS colors: light High 4.83, Medium 4.73, Low 8.33; dark High 5.15,
       Medium 5.72, Low 8.98.)
