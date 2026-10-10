@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import * as appModule from './app.tsx'
-import { listAilmentsWithCounts } from './db/queries.ts'
+import { getAgentWithAilments, listAilmentsWithCounts } from './db/queries.ts'
 import { seedAgents, seedAilments } from './db/seed.ts'
 import { createTestDb } from './db/test-db.ts'
 import {
@@ -121,6 +121,60 @@ describe('GET /ailments', () => {
       expect(card, name).toContain(label)
     }
   })
+})
+
+describe('GET /agents/:id', () => {
+  test.each(seedAgents.map(({ id }) => id))(
+    'agent %i: returns 200 with name, model, bio and each ailment with its severity',
+    async (id) => {
+      const res = await app.request(`/agents/${id}`)
+      expect(res.status).toBe(200)
+      const html = await res.text()
+      expectPageBaseline(html)
+
+      const agent = getAgentWithAilments(db, id)!
+      expect(html).toContain(`<h1>${agent.name}</h1>`)
+      expect(html).toContain(agent.model)
+      expect(html).toContain(agent.bio)
+      const diagnoses = html.split('<li>').slice(1)
+      for (const { name, severity } of agent.ailments) {
+        const row = diagnoses.find((li) => li.includes(`<span>${name}</span>`))
+        expect(row, name).toContain(`badge-${severity}`)
+      }
+      expect(diagnoses.filter((li) => li.includes('class="badge badge-'))).toHaveLength(
+        agent.ailments.length,
+      )
+    },
+  )
+
+  test('lists ailments most severe first', async () => {
+    const html = await (await app.request('/agents/5')).text()
+    const order = ['Infinite loops', 'Token anxiety', 'Hallucinations'].map((name) =>
+      html.indexOf(`<span>${name}</span>`),
+    )
+    expect(order.every((at) => at > -1)).toBe(true)
+    expect(order).toEqual([...order].sort((a, b) => a - b))
+  })
+
+  test('links back to the agents list', async () => {
+    const html = await (await app.request('/agents/1')).text()
+    expect(linkHrefs(html)).toContain('/agents')
+  })
+})
+
+describe('not found', () => {
+  test.each(['/agents/9999', '/agents/abc', '/agents/1.5', '/nope'])(
+    'GET %s returns 404 with the not-found page inside the layout',
+    async (path) => {
+      const res = await app.request(path)
+      expect(res.status).toBe(404)
+      expect(res.headers.get('content-type')).toMatch(/^text\/html/)
+      const html = await res.text()
+      expectPageBaseline(html)
+      expect(html).toContain('404: this page has been hallucinated')
+      expect(linkHrefs(html)).toContain('/agents')
+    },
+  )
 })
 
 describe('stylesheets', () => {

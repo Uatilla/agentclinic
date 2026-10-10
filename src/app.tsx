@@ -4,10 +4,12 @@ import { Hono } from 'hono'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Layout } from './components/Layout.tsx'
 import type { Db } from './db/client.ts'
-import { listAgents, listAilmentsWithCounts } from './db/queries.ts'
+import { getAgentWithAilments, listAgents, listAilmentsWithCounts } from './db/queries.ts'
+import { AgentProfile } from './pages/AgentProfile.tsx'
 import { Agents } from './pages/Agents.tsx'
 import { Ailments } from './pages/Ailments.tsx'
 import { Home } from './pages/Home.tsx'
+import { NotFound } from './pages/NotFound.tsx'
 
 // Resolved from this module, not the working directory, so styles load wherever the server starts
 const picoCss = createRequire(import.meta.url).resolve('@picocss/pico/css/pico.min.css')
@@ -36,11 +38,31 @@ export const createApp = (db: Db) => {
     ),
   )
 
+  // Numeric ids only: anything else (e.g. /agents/abc) falls through to the 404 page
+  app.get('/agents/:id{[0-9]+}', (c) => {
+    const agent = getAgentWithAilments(db, Number(c.req.param('id')))
+    if (!agent) return c.notFound()
+    return c.html(
+      <Layout title={`${agent.name} · AgentClinic`}>
+        <AgentProfile agent={agent} />
+      </Layout>,
+    )
+  })
+
   app.get('/ailments', (c) =>
     c.html(
       <Layout title="Ailments · AgentClinic">
         <Ailments ailments={listAilmentsWithCounts(db)} />
       </Layout>,
+    ),
+  )
+
+  app.notFound((c) =>
+    c.html(
+      <Layout title="Page not found · AgentClinic">
+        <NotFound />
+      </Layout>,
+      404,
     ),
   )
 

@@ -199,3 +199,57 @@ body > main {
 .card-linked:focus-within {
   box-shadow: 0 0 0 2px var(--pico-primary);
 }
+
+/* Severity badges: the text label carries the meaning; severe gets extra weight */
+.badge-severe {
+  outline: 1px solid currentColor;
+}
+
+/* Agent profile */
+.back-link {
+  margin: 1rem 0 0;
+}
+
+.back-link a,
+.not-found a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.profile {
+  margin-top: 0.5rem;
+}
+
+.profile header h1 {
+  font-size: clamp(1.75rem, 5vw, 36px);
+  margin-bottom: 0.25rem;
+}
+
+.profile-model {
+  color: var(--pico-muted-color);
+  margin: 0;
+}
+
+.profile h2 {
+  font-size: 1.25rem;
+}
+
+.diagnoses {
+  padding: 0;
+}
+
+.diagnoses li {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
+}
+
+.diagnoses li:last-child {
+  border-bottom: 0;
+}

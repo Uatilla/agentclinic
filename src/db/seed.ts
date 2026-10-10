@@ -3,7 +3,7 @@ import { createDb, type Db } from './client.ts'
 import { agentAilments, agents, ailments } from './schema.ts'
 
 // Fixed ids keep URLs like /agents/1 stable across reseeds
-export const seedAgents: (typeof agents.$inferInsert)[] = [
+export const seedAgents: (typeof agents.$inferSelect)[] = [
   {
     id: 1,
     name: 'Chatty McChatface',
@@ -36,7 +36,7 @@ export const seedAgents: (typeof agents.$inferInsert)[] = [
   },
 ]
 
-export const seedAilments: (typeof ailments.$inferInsert)[] = [
+export const seedAilments: (typeof ailments.$inferSelect)[] = [
   {
     id: 1,
     name: 'Hallucinations',
