@@ -8,8 +8,8 @@ export type AgentsProps = {
 export const Agents = ({ agents }: AgentsProps) => (
   <>
     <section class="page-intro">
-      <h1>Our patients</h1>
-      <p>Every agent currently in our care. Pick one to read their chart.</p>
+      <h1>Agents</h1>
+      <p>Our patients: every agent currently in our care. Pick one to read their chart.</p>
     </section>
     <ul class="cards">
       {agents.map((agent) => (

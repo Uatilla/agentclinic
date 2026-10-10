@@ -17,9 +17,9 @@ export const Header = ({ currentPath }: HeaderProps) => (
     <nav class="container" aria-label="Main">
       <ul>
         <li>
-          <span class="brand">
+          <a href="/" class="brand">
             <span class="brand-mark" aria-hidden="true">✚</span> AgentClinic
-          </span>
+          </a>
         </li>
       </ul>
       <ul>

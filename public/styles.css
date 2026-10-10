@@ -17,6 +17,8 @@
   --pico-primary-inverse: #fff;
   --badge-bg: #e3f4f2;
   --badge-text: #1c776d;
+  --badge-mild-bg: #eef0f3;
+  --badge-mild-text: #3f4652;
 }
 
 @media only screen and (prefers-color-scheme: dark) {
@@ -33,6 +35,9 @@
     --pico-primary-inverse: #0b1f1c;
     --badge-bg: #1d3a37;
     --badge-text: #4fc3b4;
+    --badge-mild-bg: #2a303c;
+    --badge-mild-text: #d0d5de;
+    --pico-muted-color: #8a93a3; /* Pico's #7b8495 drops below 4.5:1 on dark cards */
   }
 }
 
@@ -49,6 +54,9 @@
   --pico-primary-inverse: #0b1f1c;
   --badge-bg: #1d3a37;
   --badge-text: #4fc3b4;
+  --badge-mild-bg: #2a303c;
+  --badge-mild-text: #d0d5de;
+  --pico-muted-color: #8a93a3; /* Pico's #7b8495 drops below 4.5:1 on dark cards */
 }
 
 /* Content width: Pico's .container grows to 1200px/1450px on wide screens; keep Phase 1's
@@ -69,6 +77,13 @@ body {
 
 body > main {
   flex: 1;
+}
+
+/* Visible keyboard focus: Pico's translucent focus ring is below 3:1 */
+a:focus-visible {
+  outline: 2px solid var(--pico-primary);
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 /* Header */
@@ -96,13 +111,26 @@ body > main {
 
 .site-header nav a[aria-current='page'] {
   font-weight: 700;
-  text-decoration: underline;
   text-underline-offset: 0.3em;
 }
 
-.brand {
+/* Phones: the nav takes its own left-aligned row, with tighter spacing */
+@media (max-width: 35.999rem) {
+  .site-header nav {
+    --pico-nav-element-spacing-vertical: 0.25rem;
+  }
+
+  .site-header nav ul:last-child {
+    margin-inline-start: calc(var(--pico-nav-element-spacing-horizontal) * -1);
+  }
+}
+
+.site-header nav a.brand {
+  gap: 0.35em; /* flex drops the space between mark and name */
   font-weight: 700;
   font-size: 1.25rem;
+  color: inherit; /* Pico re-points --pico-color to the primary color on links */
+  text-decoration: none;
 }
 
 .brand-mark {
@@ -201,7 +229,13 @@ body > main {
   font-weight: 600;
 }
 
-.cards .badge {
+.card-meta {
+  font-size: 0.875rem;
+  margin-bottom: 0;
+}
+
+.cards .badge,
+.cards .card-meta {
   margin-top: auto;
   align-self: flex-start;
 }
@@ -224,9 +258,16 @@ body > main {
   box-shadow: 0 0 0 2px var(--pico-primary);
 }
 
-/* Severity badges: the text label carries the meaning; severe gets extra weight */
+/* Severity scale: mild neutral, moderate teal tint (.badge default), severe solid teal.
+   The text label carries the meaning; all pairs are at least 4.5:1. */
+.badge-mild {
+  background: var(--badge-mild-bg);
+  color: var(--badge-mild-text);
+}
+
 .badge-severe {
-  outline: 1px solid currentColor;
+  background: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
 }
 
 /* Agent profile */
@@ -235,7 +276,7 @@ body > main {
 }
 
 .back-link a,
-.not-found a {
+.status-page a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;

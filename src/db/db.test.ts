@@ -1,9 +1,10 @@
 import { existsSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { count, sql } from 'drizzle-orm'
+import { count, eq, sql } from 'drizzle-orm'
 import { afterEach, describe, expect, test } from 'vitest'
 import { createDb } from './client.ts'
+import { defaultDatabaseUrl, resolveDatabaseUrl } from './database-url.ts'
 import { agentAilments, agents, ailments } from './schema.ts'
 import { seed, seedAgents, seedAilments } from './seed.ts'
 import { createTestDb } from './test-db.ts'
@@ -21,6 +22,12 @@ describe('migrations', () => {
       .all<{ name: string }>(sql`select name from sqlite_master where type = 'table'`)
       .map(({ name }) => name)
     expect(tables).toEqual(expect.arrayContaining(['agents', 'ailments', 'agent_ailments']))
+  })
+
+  test('create no therapies table yet (Phase 3)', () => {
+    const db = createDb(':memory:')
+    const therapies = db.all(sql`select name from sqlite_master where name like '%therap%'`)
+    expect(therapies).toEqual([])
   })
 })
 
@@ -77,6 +84,20 @@ describe('constraints', () => {
       db.insert(agentAilments).values({ agentId: 999, ailmentId: 1, severity: 'mild' }).run()
     expect(sqliteErrorCode(insertUnknownAgent)).toBe('SQLITE_CONSTRAINT_FOREIGNKEY')
   })
+
+  test('deleting an agent deletes their diagnoses (cascade)', () => {
+    const db = createTestDb()
+    db.delete(agents).where(eq(agents.id, 5)).run()
+    const left = db.select().from(agentAilments).where(eq(agentAilments.agentId, 5)).all()
+    expect(left).toEqual([])
+  })
+
+  test('ailment names are unique', () => {
+    const db = createTestDb()
+    const insertDuplicate = () =>
+      db.insert(ailments).values({ name: 'Hallucinations', description: 'Again.' }).run()
+    expect(sqliteErrorCode(insertDuplicate)).toBe('SQLITE_CONSTRAINT_UNIQUE')
+  })
 })
 
 describe('createDb with a file path', () => {
@@ -92,5 +113,18 @@ describe('createDb with a file path', () => {
     const db = createDb(file)
     db.$client.close()
     expect(existsSync(file)).toBe(true)
+  })
+})
+
+describe('resolveDatabaseUrl', () => {
+  test.each([
+    ['', defaultDatabaseUrl],
+    ['   ', defaultDatabaseUrl],
+    ['data/test.db', 'data/test.db'],
+    ['file:data/test.db', 'data/test.db'],
+    ['file:///tmp/test.db', '/tmp/test.db'],
+    [':memory:', ':memory:'],
+  ])('%j → %s', (url, expected) => {
+    expect(resolveDatabaseUrl(url)).toBe(expected)
   })
 })

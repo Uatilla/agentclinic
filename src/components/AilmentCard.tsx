@@ -11,6 +11,6 @@ export const AilmentCard = ({ name, description, agentCount }: AilmentCardProps)
   <article>
     <h2>{name}</h2>
     <p>{description}</p>
-    <span class="badge">{affectedLabel(agentCount)}</span>
+    <p class="card-meta">{affectedLabel(agentCount)}</p>
   </article>
 )

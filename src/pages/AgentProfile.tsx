@@ -8,7 +8,7 @@ export type AgentProfileProps = {
 export const AgentProfile = ({ agent }: AgentProfileProps) => (
   <>
     <p class="back-link">
-      <a href="/agents">← All patients</a>
+      <a href="/agents">← All agents</a>
     </p>
     <article class="profile">
       <header>
@@ -17,13 +17,17 @@ export const AgentProfile = ({ agent }: AgentProfileProps) => (
       </header>
       <p>{agent.bio}</p>
       <h2>Diagnosed ailments</h2>
-      <ul class="diagnoses">
-        {agent.ailments.map(({ name, severity }) => (
-          <li>
-            <span>{name}</span> <SeverityBadge severity={severity} />
-          </li>
-        ))}
-      </ul>
+      {agent.ailments.length > 0 ? (
+        <ul class="diagnoses">
+          {agent.ailments.map(({ name, severity }) => (
+            <li>
+              <span>{name}</span> <SeverityBadge severity={severity} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>Clean bill of health.</p>
+      )}
     </article>
   </>
 )

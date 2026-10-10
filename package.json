@@ -15,7 +15,7 @@
     "validate": "npm run typecheck && npm test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/db/migrate.ts",
-    "db:seed": "tsx src/db/seed.ts"
+    "db:seed": "tsx src/db/seed-cli.ts"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.4",

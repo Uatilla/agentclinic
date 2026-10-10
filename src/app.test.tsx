@@ -1,7 +1,7 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import * as appModule from './app.tsx'
-import { getAgentWithAilments, listAilmentsWithCounts } from './db/queries.ts'
-import { seedAgents, seedAilments } from './db/seed.ts'
+import { seedAgentAilments, seedAgents, seedAilments } from './db/seed.ts'
+import { agents } from './db/schema.ts'
 import { createTestDb } from './db/test-db.ts'
 import {
   expectedStylesheets,
@@ -92,7 +92,8 @@ describe('GET /ailments', () => {
   test('shows how many agents have each ailment', async () => {
     const html = await (await get()).text()
     const cards = html.split('<article').slice(1)
-    for (const { name, agentCount } of listAilmentsWithCounts(db)) {
+    for (const { id, name } of seedAilments) {
+      const agentCount = seedAgentAilments.filter(({ ailmentId }) => ailmentId === id).length
       const card = cards.find((card) => card.includes(`<h2>${name}</h2>`))
       const label = `${agentCount} ${agentCount === 1 ? 'agent' : 'agents'} affected`
       expect(card, name).toContain(label)
@@ -100,29 +101,50 @@ describe('GET /ailments', () => {
   })
 })
 
+// Expected values come from the seed fixtures, not from the queries under test
+const severityLabels = { mild: 'Mild', moderate: 'Moderate', severe: 'Severe' } as const
+const diagnosesOf = (agentId: number) =>
+  seedAgentAilments
+    .filter((row) => row.agentId === agentId)
+    .map(({ ailmentId, severity }) => ({
+      name: seedAilments.find(({ id }) => id === ailmentId)!.name,
+      label: severityLabels[severity],
+    }))
+
 describe('GET /agents/:id', () => {
-  test.each(seedAgents.map(({ id }) => id))(
-    'agent %i: returns 200 with name, model, bio and each ailment with its severity',
-    async (id) => {
+  test.each(seedAgents)(
+    'agent $id: returns 200 with name, model, bio and each ailment with its severity label',
+    async ({ id, name, model, bio }) => {
       const res = await app.request(`/agents/${id}`)
       expect(res.status).toBe(200)
       const html = await res.text()
       expectPageBaseline(html)
+      expect(html).toContain(`<h1>${name}</h1>`)
+      expect(html).toContain(model)
+      expect(html).toContain(bio)
 
-      const agent = getAgentWithAilments(db, id)!
-      expect(html).toContain(`<h1>${agent.name}</h1>`)
-      expect(html).toContain(agent.model)
-      expect(html).toContain(agent.bio)
-      const diagnoses = html.split('<li>').slice(1)
-      for (const { name, severity } of agent.ailments) {
-        const row = diagnoses.find((li) => li.includes(`<span>${name}</span>`))
-        expect(row, name).toContain(`badge-${severity}`)
+      const expected = diagnosesOf(id)
+      expect(expected.length).toBeGreaterThan(0)
+      const rows = html.split('<li>').filter((li) => li.includes('class="badge badge-'))
+      expect(rows).toHaveLength(expected.length)
+      for (const { name: ailment, label } of expected) {
+        const row = rows.find((li) => li.includes(`<span>${ailment}</span>`))
+        expect(row, ailment).toContain(`>${label}</span>`)
       }
-      expect(diagnoses.filter((li) => li.includes('class="badge badge-'))).toHaveLength(
-        agent.ailments.length,
-      )
     },
   )
+
+  test('shows "Clean bill of health." for an agent with no ailments', async () => {
+    const healthyDb = createTestDb()
+    healthyDb
+      .insert(agents)
+      .values({ id: 99, name: 'Healthy Hal', model: 'Fresh', bio: 'Fine.' })
+      .run()
+    const html = await (await appModule.createApp(healthyDb).request('/agents/99')).text()
+    expectPageBaseline(html)
+    expect(html).toContain('Clean bill of health.')
+    expect(html).not.toContain('class="diagnoses"')
+  })
 
   test('lists ailments most severe first', async () => {
     const html = await (await app.request('/agents/5')).text()
@@ -162,20 +184,21 @@ describe('every page', () => {
     expectPageBaseline(await (await app.request(path)).text())
   })
 
-  test.each(pages)('%s has the header nav to Home, Agents and Ailments', async (path) => {
+  test.each(pages)('%s has the header nav: brand, Home, Agents, Ailments', async (path) => {
     const html = await (await app.request(path)).text()
     const nav = html.match(/<nav[^>]*aria-label="Main"[^>]*>[\s\S]*?<\/nav>/)?.[0]
     expect(nav).toBeDefined()
-    expect(linkHrefs(nav!)).toEqual(['/', '/agents', '/ailments'])
+    expect(linkHrefs(nav!)).toEqual(['/', '/', '/agents', '/ailments'])
+    expect(nav).toMatch(/<a href="\/" class="brand">/)
   })
 
-  // Replaces Phase 1's "no <a> links" guard: links are fine as long as they lead somewhere
+  // Replaces Phase 1's "no <a> links" guard: links are fine as long as they lead to a real page
   test.each(pages)('every internal link on %s resolves (not 404)', async (path) => {
     const html = await (await app.request(path)).text()
     const internal = linkHrefs(html).filter((href) => href.startsWith('/'))
     expect(internal.length).toBeGreaterThan(0)
     for (const href of internal) {
-      expect((await app.request(href)).status, `${path} → ${href}`).not.toBe(404)
+      expect((await app.request(href)).status, `${path} → ${href}`).toBe(200)
     }
   })
 })
@@ -192,9 +215,30 @@ describe('nav marks the current section', () => {
     expect(currentLinks.map(([, href]) => href)).toEqual([current])
   })
 
-  test('no section is current on the 404 page', async () => {
-    const html = await (await app.request('/nope')).text()
+  test.each(['/nope', '/agents/9999', '/agents/abc', '/ailments/1'])(
+    'no section is current on the 404 page at %s',
+    async (path) => {
+      const res = await app.request(path)
+      expect(res.status).toBe(404)
+      expect(await res.text()).not.toContain('aria-current')
+    },
+  )
+})
+
+describe('server errors', () => {
+  test('an unexpected error returns 500 with an error page inside the layout', async () => {
+    const brokenDb = createTestDb()
+    brokenDb.$client.close()
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const res = await appModule.createApp(brokenDb).request('/agents')
+    errors.mockRestore()
+
+    expect(res.status).toBe(500)
+    const html = await res.text()
+    expectPageBaseline(html)
+    expect(html).toContain('500: we’ve lost our train of thought')
     expect(html).not.toContain('aria-current')
+    expect(linkHrefs(html)).toContain('/')
   })
 })
 

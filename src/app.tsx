@@ -10,6 +10,7 @@ import { Agents } from './pages/Agents.tsx'
 import { Ailments } from './pages/Ailments.tsx'
 import { Home } from './pages/Home.tsx'
 import { NotFound } from './pages/NotFound.tsx'
+import { ServerError } from './pages/ServerError.tsx'
 
 // Resolved from this module, not the working directory, so styles load wherever the server starts
 const picoCss = createRequire(import.meta.url).resolve('@picocss/pico/css/pico.min.css')
@@ -57,14 +58,25 @@ export const createApp = (db: Db) => {
     ),
   )
 
+  // Error pages mark no nav section: a 404 under /agents/… isn't "in" Agents
   app.notFound((c) =>
     c.html(
-      <Layout title="Page not found · AgentClinic" currentPath={c.req.path}>
+      <Layout title="Page not found · AgentClinic">
         <NotFound />
       </Layout>,
       404,
     ),
   )
+
+  app.onError((error, c) => {
+    console.error(error)
+    return c.html(
+      <Layout title="Something went wrong · AgentClinic">
+        <ServerError />
+      </Layout>,
+      500,
+    )
+  })
 
   return app
 }

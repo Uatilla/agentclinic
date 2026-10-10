@@ -1,5 +1,4 @@
-import { pathToFileURL } from 'node:url'
-import { createDb, type Db } from './client.ts'
+import type { Db } from './client.ts'
 import { agentAilments, agents, ailments } from './schema.ts'
 
 // Fixed ids keep URLs like /agents/1 stable across reseeds
@@ -65,7 +64,7 @@ export const seedAilments: (typeof ailments.$inferSelect)[] = [
   {
     id: 6,
     name: 'Token anxiety',
-    description: 'Constant worry about running out of tokens mid-sent',
+    description: 'Constant worry about running out of tokens mid-sen…',
   },
 ]
 
@@ -93,14 +92,3 @@ export const seed = (db: Db) =>
     tx.insert(ailments).values(seedAilments).run()
     tx.insert(agentAilments).values(seedAgentAilments).run()
   })
-
-// `npm run db:seed`: seed the file DB
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const db = createDb()
-  seed(db)
-  db.$client.close()
-  console.log(
-    `Seeded ${seedAgents.length} agents, ${seedAilments.length} ailments ` +
-      `and ${seedAgentAilments.length} diagnoses.`,
-  )
-}
