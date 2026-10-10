@@ -442,7 +442,15 @@ describe('nav marks the current section', () => {
     expect(currentLinks.map(([, href]) => href)).toEqual([current])
   })
 
-  test.each(['/nope', '/agents/9999', '/agents/abc', '/ailments/9999', '/therapies/9999'])(
+  test.each([
+    '/nope',
+    '/agents/9999',
+    '/agents/abc',
+    '/ailments/9999',
+    '/ailments/abc',
+    '/therapies/9999',
+    '/therapies/abc',
+  ])(
     'no section is current on the 404 page at %s',
     async (path) => {
       const res = await app.request(path)

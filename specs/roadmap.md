@@ -28,15 +28,22 @@ Spec: [`2026-10-10-agents-ailments`](./2026-10-10-agents-ailments/)
 - `/ailments` page listing ailments
 - Header nav (Home, Agents, Ailments); home cards link to the new pages
 
-## Phase 3: Therapies catalog
+## MVP: Phases 3 and 4 — ✅ Done
+
+Spec: [`2026-10-10-mvp`](./2026-10-10-mvp/) (one branch and spec for both phases, built in
+phase order with a checkpoint between them)
+
+### Phase 3: Therapies catalog
 
 - `therapies` schema + seed data
-- `/therapies` page listing therapies
+- `/therapies` page listing therapies, and `/therapies/:id`
+- Therapies in the header nav; the home Therapies card links
 
-## Phase 4: Therapies ↔ ailments
+### Phase 4: Therapies ↔ ailments
 
-- Match therapies to ailments
-- Ailment and agent pages show recommended therapies
+- Match therapies to ailments (`therapy_ailments`, with effectiveness)
+- `/ailments/:id` shows recommended therapies and affected agents
+- Agent profiles show recommended therapies for each ailment
 
 ## Backlog (not scheduled)
 

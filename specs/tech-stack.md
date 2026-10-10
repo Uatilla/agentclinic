@@ -59,6 +59,8 @@ Every page in the web UI is responsive:
 ## Conventions
 
 - Specs live in `specs/` and are the source of truth.
-- One branch per roadmap phase, merged to `main` when its validation passes.
+- One branch per roadmap phase, or per milestone that groups consecutive phases under one
+  spec (e.g. the MVP: Phases 3–4), merged to `main` through a pull request when its
+  validation passes.
 - Component props are declared as a named, extracted TypeScript type (`type FooProps = {...}`),
   never as an inline object type in the parameter list.
