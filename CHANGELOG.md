@@ -4,6 +4,23 @@ All notable changes to this project, newest first.
 
 ## 2026-10-10
 
+- Wrote the MVP feature spec, combining roadmap Phases 3 and 4 (therapies catalog and matching)
+  on one branch with a checkpoint between them, then amended it after a pre-build review:
+  therapy–ailment data appears only once it exists, agent profiles list every therapy per
+  ailment, and close-out includes the changelog, study notes and a pull request.
+- Added therapies: a `therapies` table with 6 playful seed therapies, a `/therapies` page and
+  `/therapies/:id` detail pages, Therapies in the header nav, and a linked home card, so nothing
+  is "Coming soon" any more. The phone nav now wraps instead of overflowing with four links.
+- Matched therapies to ailments through a `therapy_ailments` table with a low/medium/high
+  effectiveness enforced by a database `CHECK`, seeded so every ailment has at least one
+  therapy.
+- Added `/ailments/:id` pages with recommended therapies (most effective first) and affected
+  agents, ailments listed on therapy pages, and recommended therapies under each ailment on
+  agent profiles, with graded effectiveness badges that meet WCAG AA and "No known cure — yet."
+  empty states.
+- Grew the test suite to 184 Vitest tests, replacing the "no therapies" guards with booking,
+  dashboard and write-route guards; documented the pages in the README, marked Phases 3–4 done
+  in the roadmap, and allowed one branch per milestone in the tech stack.
 - Added the database: SQLite through Drizzle ORM and better-sqlite3 (its install script denied,
   since v13 ships prebuilt binaries), with `agents`, `ailments` and an `agent_ailments` join
   table whose severity is enforced by a database `CHECK`, committed migrations, and an

@@ -67,8 +67,8 @@ The MVP can merge to `main` when every box below is checked.
   - [x] 1280px: content centered within the max width.
   - [x] Nav links, cards and therapy links are at least 44×44px touch targets.
 - [x] README, roadmap and tech-stack reflect the MVP.
-- [ ] `CHANGELOG.md` has an entry for the MVP.
-- [ ] `prompts.md` has concise, reusable SDD lessons from this MVP.
+- [x] `CHANGELOG.md` has an entry for the MVP.
+- [x] `prompts.md` has concise, reusable SDD lessons from this MVP.
 
 ## Scope guard
 
