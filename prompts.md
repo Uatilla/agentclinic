@@ -16,12 +16,14 @@ agent shares context through them, and every decision stays reviewable in git.
 | Amendment | A dated note + edits to a spec when reality differs from the plan |
 | Merge bar | `validation.md`: every box ticked, each with evidence (test, measure, CI run, person) |
 | Replan | Short roadmap review after each merge, before the next spec |
+| Backlog | Ideas and research not yet committed; promoted to the roadmap on purpose, never built directly |
 
 ## Repository layout
     specs/
       mission.md          why, for whom, scope, principles
       tech-stack.md       language, frameworks, quality rules, conventions
-      roadmap.md          phases in order (+ backlog), each linked to its spec
+      roadmap.md          phases in order, each linked to its spec
+      backlog/            ideas + research, not committed (README: "don't implement")
       YYYY-MM-DD-<name>/
         requirements.md   context, scope in/out, decisions table (+ amendment notes)
         plan.md           numbered task groups, each with a Check
@@ -72,18 +74,46 @@ agent shares context through them, and every decision stays reviewable in git.
 ## Replanning
 - After every merge, before the next spec: what changes the next phase?
   "Roadmap still holds" is a valid answer.
-- Touch mission/tech stack only if a rule changed. New ideas → backlog.
-  Mid-phase changes → amend that phase's spec instead.
+- Touch mission/tech stack only if a rule changed. Mid-phase changes → amend that phase's spec instead.
+- New ideas → backlog: keep entries short (idea, research/links, status: raw · researched ·
+  promoted · dropped). Mark dropped ideas with the reason instead of deleting them.
+- Promote on purpose: backlog → roadmap → feature spec. Never spec straight from the backlog.
 - Commit the replan on its own.
 
 ## Working with an agent
-Prompt pattern:
-> One-line intent + where the requirements live. Create/update <files> in `specs/`.
+Prompt templates (replace `<…>`). Each ends with the interview line, so the agent asks before writing.
+
+**Constitution, greenfield**
+> We're building <project>: <one-line pitch>. Stakeholder input is in <file>.
+> Create a constitution in `specs/`: `mission.md`, `tech-stack.md`, and `roadmap.md` in very
+> small phases, ordered by <TODO / priorities>.
+> Interview me about mission, target audience and tech-stack gaps.
 > You *must* use AskUserQuestion, grouped per file, before writing to disk.
+
+**Constitution, brownfield**
+> This is an existing project: <one-line pitch>. Read the code, README and git history first.
+> Create a constitution in `specs/` describing what *is*: `mission.md`, `tech-stack.md`
+> (actual stack + conventions found in the code), `roadmap.md` (existing work as done, then
+> next work in very small phases). Separate what you inferred from what you couldn't tell.
+> Interview me about the gaps.
+> You *must* use AskUserQuestion, grouped per file, before writing to disk.
+
+Brownfield: don't retro-spec existing code. The constitution captures the present;
+feature specs start with the next change.
+
+**Feature spec**
+> Find the next phase in `specs/roadmap.md`, create a branch, and interview me about the spec.
+> Create `specs/YYYY-MM-DD-<feature>/` with `requirements.md` (scope, decisions, context),
+> `plan.md` (numbered task groups, each with a Check) and `validation.md` (how we know it
+> succeeded and can be merged). Follow `specs/mission.md` and `specs/tech-stack.md`.
+> You *must* use AskUserQuestion, grouped per file, before writing to disk.
+
+Repeated prompt → make it a skill (see `skills.md`).
 
 Rules for the agent:
 - Ask before writing specs; surface assumptions, let the human decide.
 - Follow the plan one group at a time; report results and ask before the next group.
 - If the code must differ from the spec, propose an amendment first.
 - Tick validation boxes only with evidence; never merge before every box is ticked.
+- Treat `specs/backlog/` as unapproved ideas: read for context, never implement from it.
 - Confirm before outward actions (push, PR, merge, deleting branches).
