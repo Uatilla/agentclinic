@@ -114,13 +114,16 @@ a:focus-visible {
   text-underline-offset: 0.3em;
 }
 
-/* Phones: the nav takes its own left-aligned row, with tighter spacing */
+/* Phones: the nav takes its own left-aligned row, with tighter spacing; the links wrap
+   rather than overflow when they don't fit (e.g. 320px with a classic scrollbar) */
 @media (max-width: 35.999rem) {
   .site-header nav {
     --pico-nav-element-spacing-vertical: 0.25rem;
+    --pico-nav-element-spacing-horizontal: 0.625rem;
   }
 
   .site-header nav ul:last-child {
+    flex-wrap: wrap;
     margin-inline-start: calc(var(--pico-nav-element-spacing-horizontal) * -1);
   }
 }

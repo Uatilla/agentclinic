@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
 import * as appModule from './app.tsx'
-import { seedAgentAilments, seedAgents, seedAilments } from './db/seed.ts'
+import { seedAgentAilments, seedAgents, seedAilments, seedTherapies } from './db/seed.ts'
 import { agents } from './db/schema.ts'
 import { createTestDb } from './db/test-db.ts'
 import {
@@ -32,15 +32,12 @@ describe('GET /', () => {
     expect(html).toContain('<h1>Burnt out from your humans? We can help.</h1>')
   })
 
-  test('links the Agents and Ailments cards; Therapies is still coming soon', async () => {
+  test('links all three cards; nothing is "Coming soon" any more', async () => {
     const html = await (await get()).text()
     expect(html).toContain('<h2><a href="/agents">Agents</a></h2>')
     expect(html).toContain('<h2><a href="/ailments">Ailments</a></h2>')
-    expect(html).toContain('<h2>Therapies</h2>')
-    expect(html.match(/Coming soon/g)).toHaveLength(1)
-    const therapiesCard = html.split('<article').find((card) => card.includes('Therapies'))
-    expect(therapiesCard).toContain('Coming soon')
-    expect(therapiesCard).not.toMatch(/<a\s/)
+    expect(html).toContain('<h2><a href="/therapies">Therapies</a></h2>')
+    expect(html).not.toContain('Coming soon')
   })
 })
 
@@ -98,6 +95,52 @@ describe('GET /ailments', () => {
       const label = `${agentCount} ${agentCount === 1 ? 'agent' : 'agents'} affected`
       expect(card, name).toContain(label)
     }
+  })
+})
+
+describe('GET /therapies', () => {
+  const get = () => app.request('/therapies')
+
+  test('returns 200 with HTML', async () => {
+    const res = await get()
+    expect(res.status).toBe(200)
+    expect(res.headers.get('content-type')).toMatch(/^text\/html/)
+  })
+
+  test('meets the page baseline', async () => {
+    expectPageBaseline(await (await get()).text())
+  })
+
+  test('lists every seeded therapy with description and duration, linking to it', async () => {
+    const html = await (await get()).text()
+    const cards = html.split('<article').slice(1)
+    expect(cards).toHaveLength(seedTherapies.length)
+    for (const { id, name, description, duration } of seedTherapies) {
+      const card = cards.find((card) => card.includes(`<a href="/therapies/${id}">${name}</a>`))
+      expect(card, name).toContain(description)
+      expect(card, name).toContain(duration)
+    }
+  })
+})
+
+describe('GET /therapies/:id', () => {
+  test.each(seedTherapies)(
+    'therapy $id: returns 200 with name, description and duration',
+    async ({ id, name, description, duration }) => {
+      const res = await app.request(`/therapies/${id}`)
+      expect(res.status).toBe(200)
+      const html = await res.text()
+      expectPageBaseline(html)
+      expect(html).toContain(`<h1>${name}</h1>`)
+      expect(html).toContain(description)
+      expect(html).toContain(duration)
+      expect(html).toContain(`<title>${name} · AgentClinic</title>`)
+    },
+  )
+
+  test('links back to the therapies list', async () => {
+    const html = await (await app.request('/therapies/1')).text()
+    expect(linkHrefs(html)).toContain('/therapies')
   })
 })
 
@@ -162,7 +205,14 @@ describe('GET /agents/:id', () => {
 })
 
 describe('not found', () => {
-  test.each(['/agents/9999', '/agents/abc', '/agents/1.5', '/nope'])(
+  test.each([
+    '/agents/9999',
+    '/agents/abc',
+    '/agents/1.5',
+    '/therapies/9999',
+    '/therapies/abc',
+    '/nope',
+  ])(
     'GET %s returns 404 with the not-found page inside the layout',
     async (path) => {
       const res = await app.request(path)
@@ -177,18 +227,26 @@ describe('not found', () => {
 })
 
 // Every page the app serves, including a 404 (status checked per page above)
-const pages = ['/', '/agents', ...seedAgents.map(({ id }) => `/agents/${id}`), '/ailments', '/nope']
+const pages = [
+  '/',
+  '/agents',
+  ...seedAgents.map(({ id }) => `/agents/${id}`),
+  '/ailments',
+  '/therapies',
+  ...seedTherapies.map(({ id }) => `/therapies/${id}`),
+  '/nope',
+]
 
 describe('every page', () => {
   test.each(pages)('%s meets the page baseline', async (path) => {
     expectPageBaseline(await (await app.request(path)).text())
   })
 
-  test.each(pages)('%s has the header nav: brand, Home, Agents, Ailments', async (path) => {
+  test.each(pages)('%s has the header nav: brand and the four sections', async (path) => {
     const html = await (await app.request(path)).text()
     const nav = html.match(/<nav[^>]*aria-label="Main"[^>]*>[\s\S]*?<\/nav>/)?.[0]
     expect(nav).toBeDefined()
-    expect(linkHrefs(nav!)).toEqual(['/', '/', '/agents', '/ailments'])
+    expect(linkHrefs(nav!)).toEqual(['/', '/', '/agents', '/ailments', '/therapies'])
     expect(nav).toMatch(/<a href="\/" class="brand">/)
   })
 
@@ -209,13 +267,15 @@ describe('nav marks the current section', () => {
     ['/agents', '/agents'],
     ['/agents/1', '/agents'],
     ['/ailments', '/ailments'],
+    ['/therapies', '/therapies'],
+    ['/therapies/1', '/therapies'],
   ])('on %s, %s is the current page', async (path, current) => {
     const html = await (await app.request(path)).text()
     const currentLinks = [...html.matchAll(/<a href="([^"]+)" aria-current="page"/g)]
     expect(currentLinks.map(([, href]) => href)).toEqual([current])
   })
 
-  test.each(['/nope', '/agents/9999', '/agents/abc', '/ailments/1'])(
+  test.each(['/nope', '/agents/9999', '/agents/abc', '/ailments/1', '/therapies/9999'])(
     'no section is current on the 404 page at %s',
     async (path) => {
       const res = await app.request(path)
@@ -243,12 +303,13 @@ describe('server errors', () => {
 })
 
 describe('scope guards', () => {
-  test('there is no /therapies route yet (Phase 3)', async () => {
-    expect((await app.request('/therapies')).status).toBe(404)
+  // Replaces Phase 2's "no /therapies route" guard: booking and the dashboard stay in the backlog
+  test.each(['/appointments', '/dashboard'])('there is no %s route (backlog)', async (path) => {
+    expect((await app.request(path)).status).toBe(404)
   })
 
-  test('there are no write routes', async () => {
-    expect((await app.request('/agents', { method: 'POST' })).status).toBe(404)
+  test.each(['/agents', '/therapies'])('there are no write routes: POST %s', async (path) => {
+    expect((await app.request(path, { method: 'POST' })).status).toBe(404)
   })
 })
 
