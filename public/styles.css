@@ -261,14 +261,17 @@ a:focus-visible {
   box-shadow: 0 0 0 2px var(--pico-primary);
 }
 
-/* Severity scale: mild neutral, moderate teal tint (.badge default), severe solid teal.
-   The text label carries the meaning; all pairs are at least 4.5:1. */
-.badge-mild {
+/* Graded scales: neutral, teal tint (.badge default), solid teal. Severity is
+   mild/moderate/severe; effectiveness is low/medium/high. The text label carries the
+   meaning; all pairs are at least 4.5:1. */
+.badge-mild,
+.badge-low {
   background: var(--badge-mild-bg);
   color: var(--badge-mild-text);
 }
 
-.badge-severe {
+.badge-severe,
+.badge-high {
   background: var(--pico-primary-background);
   color: var(--pico-primary-inverse);
 }
@@ -320,4 +323,16 @@ a:focus-visible {
 
 .diagnoses li:last-child {
   border-bottom: 0;
+}
+
+/* A badge that wraps under a long name stays right-aligned, like the others */
+.diagnoses li > .badge {
+  margin-inline-start: auto;
+}
+
+/* Links in detail lists (ailments, therapies, agents) are 44px touch targets */
+.diagnoses a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }

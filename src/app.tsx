@@ -6,12 +6,14 @@ import { Layout } from './components/Layout.tsx'
 import type { Db } from './db/client.ts'
 import {
   getAgentWithAilments,
+  getAilmentDetail,
   getTherapyWithAilments,
   listAgents,
   listAilmentsWithCounts,
   listTherapiesWithCounts,
 } from './db/queries.ts'
 import { AgentProfile } from './pages/AgentProfile.tsx'
+import { AilmentDetail } from './pages/AilmentDetail.tsx'
 import { Agents } from './pages/Agents.tsx'
 import { Ailments } from './pages/Ailments.tsx'
 import { Home } from './pages/Home.tsx'
@@ -65,6 +67,16 @@ export const createApp = (db: Db) => {
       </Layout>,
     ),
   )
+
+  app.get('/ailments/:id{[0-9]+}', (c) => {
+    const ailment = getAilmentDetail(db, Number(c.req.param('id')))
+    if (!ailment) return c.notFound()
+    return c.html(
+      <Layout title={`${ailment.name} · AgentClinic`} currentPath={c.req.path}>
+        <AilmentDetail ailment={ailment} />
+      </Layout>,
+    )
+  })
 
   app.get('/therapies', (c) =>
     c.html(

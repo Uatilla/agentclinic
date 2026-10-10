@@ -1,8 +1,8 @@
 import { TherapyCard } from '../components/TherapyCard.tsx'
-import type { Therapy } from '../db/queries.ts'
+import type { TherapyWithCount } from '../db/queries.ts'
 
 export type TherapiesProps = {
-  therapies: Therapy[]
+  therapies: TherapyWithCount[]
 }
 
 export const Therapies = ({ therapies }: TherapiesProps) => (
