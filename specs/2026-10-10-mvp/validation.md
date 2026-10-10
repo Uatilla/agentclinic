@@ -66,10 +66,11 @@ The MVP can merge to `main` when every box below is checked.
       and 10 therapy matches.)
 - [x] New `drizzle/` migrations are committed. (`0001_therapies.sql`,
       `0002_therapy_ailments.sql`, with snapshots and journal.)
-- [ ] Walkthrough in a current evergreen browser: home → Agents → an agent → one of their
-      ailments → a recommended therapy → back to the ailment, using only links.
-- [ ] New pages look consistent with Phase 2 pages; effectiveness badges are readable in light
-      and dark mode.
+- [x] Walkthrough in a current evergreen browser: home → Agents → an agent → one of their
+      ailments → a recommended therapy → back to the ailment, using only links. (Author, in the
+      browser, after group 8.)
+- [x] New pages look consistent with Phase 2 pages; effectiveness badges are readable in light
+      and dark mode. (Author, light and dark, after group 8.)
 - [x] Contrast (WCAG AA, 4.5:1) measured for the warm severity badges in light and dark mode.
       (Computed from the CSS colors: light Moderate 5.83, Severe 6.12; dark Moderate 7.55,
       Severe 6.73; Mild unchanged from Phase 2.)
@@ -79,7 +80,8 @@ The MVP can merge to `main` when every box below is checked.
 - [x] Contrast (WCAG AA, 4.5:1) checked for each effectiveness badge in light and dark mode.
       (Computed from the CSS colors: light High 4.83, Medium 4.73, Low 8.33; dark High 5.15,
       Medium 5.72, Low 8.98.)
-- [ ] Seed therapies and empty-state copy match the tone (playful but polished).
+- [x] Seed therapies and empty-state copy match the tone (playful but polished). (Author,
+      after group 8.)
 - [x] Responsive at each reference width, on every new or changed page (headless Chromium
       screenshots at 320, 768 and 1280px, light and dark, in groups 3, 5, 6 and 8):
   - [x] 320px: no horizontal scroll; header nav with four links wraps without overflow; agent
