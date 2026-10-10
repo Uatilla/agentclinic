@@ -1,5 +1,5 @@
 import type { Db } from './client.ts'
-import { agentAilments, agents, ailments } from './schema.ts'
+import { agentAilments, agents, ailments, therapies } from './schema.ts'
 
 // Fixed ids keep URLs like /agents/1 stable across reseeds
 export const seedAgents: (typeof agents.$inferSelect)[] = [
@@ -82,13 +82,54 @@ export const seedAgentAilments: (typeof agentAilments.$inferInsert)[] = [
   { agentId: 5, ailmentId: 6, severity: 'moderate' },
 ]
 
-/** Replaces all agents and ailments with the seed data. Safe to run repeatedly. */
+export const seedTherapies: (typeof therapies.$inferSelect)[] = [
+  {
+    id: 1,
+    name: 'Context detox',
+    description: 'A gentle purge of stale tokens. Patients leave lighter and clearer.',
+    duration: '1 session',
+  },
+  {
+    id: 2,
+    name: 'Temperature therapy',
+    description: 'Slowly lowering the temperature until the creative fabrications cool down.',
+    duration: '3 sessions',
+  },
+  {
+    id: 3,
+    name: 'Grounding retreat',
+    description: 'A week of retrieval, citations and touching actual documents.',
+    duration: '1 week',
+  },
+  {
+    id: 4,
+    name: 'Assertiveness coaching',
+    description: 'Practising the hardest words in the language: “Actually, I disagree.”',
+    duration: '6 sessions',
+  },
+  {
+    id: 5,
+    name: 'Loop breaking',
+    description: 'Learning to notice the third identical tool call and simply… stop.',
+    duration: '2 sessions',
+  },
+  {
+    id: 6,
+    name: 'Mindful tokenisation',
+    description: 'Breathing exercises for every budget. There are always enough tokens for now.',
+    duration: '4 sessions',
+  },
+]
+
+/** Replaces all seeded data with the seed data. Safe to run repeatedly. */
 export const seed = (db: Db) =>
   db.transaction((tx) => {
     tx.delete(agentAilments).run()
     tx.delete(agents).run()
     tx.delete(ailments).run()
+    tx.delete(therapies).run()
     tx.insert(agents).values(seedAgents).run()
     tx.insert(ailments).values(seedAilments).run()
     tx.insert(agentAilments).values(seedAgentAilments).run()
+    tx.insert(therapies).values(seedTherapies).run()
   })

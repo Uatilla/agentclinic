@@ -5,14 +5,15 @@ import { count, eq, sql } from 'drizzle-orm'
 import { afterEach, describe, expect, test } from 'vitest'
 import { createDb } from './client.ts'
 import { defaultDatabaseUrl, resolveDatabaseUrl } from './database-url.ts'
-import { agentAilments, agents, ailments } from './schema.ts'
-import { seed, seedAgents, seedAilments } from './seed.ts'
+import { agentAilments, agents, ailments, therapies } from './schema.ts'
+import { seed, seedAgents, seedAilments, seedTherapies } from './seed.ts'
 import { createTestDb } from './test-db.ts'
 
 const counts = (db: ReturnType<typeof createTestDb>) => ({
   agents: db.select({ n: count() }).from(agents).get()?.n,
   ailments: db.select({ n: count() }).from(ailments).get()?.n,
   agentAilments: db.select({ n: count() }).from(agentAilments).get()?.n,
+  therapies: db.select({ n: count() }).from(therapies).get()?.n,
 })
 
 describe('migrations', () => {
@@ -24,10 +25,12 @@ describe('migrations', () => {
     expect(tables).toEqual(expect.arrayContaining(['agents', 'ailments', 'agent_ailments']))
   })
 
-  test('create no therapies table yet (Phase 3)', () => {
+  test('create the therapies table', () => {
     const db = createDb(':memory:')
-    const therapies = db.all(sql`select name from sqlite_master where name like '%therap%'`)
-    expect(therapies).toEqual([])
+    const tables = db
+      .all<{ name: string }>(sql`select name from sqlite_master where type = 'table'`)
+      .map(({ name }) => name)
+    expect(tables).toContain('therapies')
   })
 })
 
@@ -37,6 +40,12 @@ describe('seed', () => {
     expect(counts(db)).toMatchObject({ agents: 5, ailments: 6 })
     expect(seedAgents).toHaveLength(5)
     expect(seedAilments).toHaveLength(6)
+  })
+
+  test('inserts 6 therapies', () => {
+    const db = createTestDb()
+    expect(counts(db)).toMatchObject({ therapies: 6 })
+    expect(seedTherapies).toHaveLength(6)
   })
 
   test('is idempotent: seeding twice gives the same row counts', () => {
@@ -96,6 +105,16 @@ describe('constraints', () => {
     const db = createTestDb()
     const insertDuplicate = () =>
       db.insert(ailments).values({ name: 'Hallucinations', description: 'Again.' }).run()
+    expect(sqliteErrorCode(insertDuplicate)).toBe('SQLITE_CONSTRAINT_UNIQUE')
+  })
+
+  test('therapy names are unique', () => {
+    const db = createTestDb()
+    const insertDuplicate = () =>
+      db
+        .insert(therapies)
+        .values({ name: 'Context detox', description: 'Again.', duration: '1 session' })
+        .run()
     expect(sqliteErrorCode(insertDuplicate)).toBe('SQLITE_CONSTRAINT_UNIQUE')
   })
 })

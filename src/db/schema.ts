@@ -37,3 +37,10 @@ export const agentAilments = sqliteTable(
     ),
   ],
 )
+
+export const therapies = sqliteTable('therapies', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull().unique(),
+  description: text('description').notNull(),
+  duration: text('duration').notNull(),
+})
