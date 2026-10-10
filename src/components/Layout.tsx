@@ -6,10 +6,11 @@ import { Main } from './Main.tsx'
 
 type LayoutProps = {
   title?: string
+  currentPath?: string
   children?: Child
 }
 
-export const Layout = ({ title = 'AgentClinic', children }: LayoutProps) => (
+export const Layout = ({ title = 'AgentClinic', currentPath, children }: LayoutProps) => (
   <>
     {raw('<!DOCTYPE html>')}
     <html lang="en">
@@ -17,10 +18,11 @@ export const Layout = ({ title = 'AgentClinic', children }: LayoutProps) => (
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{title}</title>
+        <link rel="stylesheet" href="/public/vendor/pico.min.css" />
         <link rel="stylesheet" href="/public/styles.css" />
       </head>
       <body>
-        <Header />
+        <Header currentPath={currentPath} />
         <Main>{children}</Main>
         <Footer />
       </body>

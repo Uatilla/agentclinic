@@ -16,6 +16,18 @@
 - Minimal client-side JavaScript; add it only when a feature needs it.
 - Semantic HTML and modern CSS, targeting current evergreen browsers.
 
+## Styling
+
+- **[PicoCSS](https://picocss.com/) v2** is the CSS foundation: CSS only (no JavaScript), it
+  styles semantic HTML, it's mobile-first, and it supports light and dark mode.
+- Installed from npm (`@picocss/pico`) and **served locally** at
+  `/public/vendor/pico.min.css` via `serveStatic`. No CDN, so the version is pinned in the
+  lockfile and the stylesheet is covered by route tests.
+- **`public/styles.css`** loads after Pico and holds only overrides: brand colors set through
+  Pico's `--pico-*` CSS variables, plus components Pico doesn't provide (e.g. the card grid,
+  badges). Prefer Pico's semantic elements and classes (`.container`, `<article>`, `<nav>`)
+  over custom CSS.
+
 ## Responsive design
 
 Every page in the web UI is responsive:
@@ -48,3 +60,5 @@ Every page in the web UI is responsive:
 
 - Specs live in `specs/` and are the source of truth.
 - One branch per roadmap phase, merged to `main` when its validation passes.
+- Component props are declared as a named, extracted TypeScript type (`type FooProps = {...}`),
+  never as an inline object type in the parameter list.

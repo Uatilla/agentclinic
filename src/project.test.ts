@@ -1,4 +1,5 @@
 import { existsSync, globSync, readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { describe, expect, test } from 'vitest'
 
@@ -26,6 +27,38 @@ describe('project structure', () => {
   test('pins Node 24 locally and in engines', () => {
     expect(readFileSync(resolve(root, '.nvmrc'), 'utf8').trim()).toBe('24')
     expect(pkg.engines.node).toBe('>=24')
+  })
+
+  test('installs PicoCSS v2 from npm', () => {
+    expect(pkg.dependencies['@picocss/pico']).toMatch(/^\^?2\./)
+  })
+
+  test('sets up Drizzle with better-sqlite3 and db scripts', () => {
+    expect(pkg.dependencies).toHaveProperty('drizzle-orm')
+    expect(pkg.dependencies).toHaveProperty('better-sqlite3')
+    expect(pkg.devDependencies).toHaveProperty('drizzle-kit')
+    expect(Object.keys(pkg.scripts)).toEqual(
+      expect.arrayContaining(['db:generate', 'db:migrate', 'db:seed']),
+    )
+    expect(existsSync(resolve(root, 'drizzle.config.ts'))).toBe(true)
+  })
+
+  test('loads better-sqlite3 from its prebuilt binary, with no install script', () => {
+    expect(pkg.allowScripts['better-sqlite3']).toBe(false)
+    const Database = createRequire(import.meta.url)('better-sqlite3')
+    expect(new Database(':memory:').prepare('select 1 as one').get()).toEqual({ one: 1 })
+  })
+
+  test('no test points at the file database through DATABASE_URL', () => {
+    const tests = globSync('src/**/*.test.{ts,tsx}', { cwd: root })
+    for (const path of tests) {
+      expect(readFileSync(resolve(root, path), 'utf8'), path).not.toMatch(/DATABASE_URL\s*=/)
+    }
+  })
+
+  test('git-ignores the local database', () => {
+    const ignored = readFileSync(resolve(root, '.gitignore'), 'utf8').split('\n')
+    expect(ignored).toContain('/data')
   })
 
   test('exposes the validate script', () => {

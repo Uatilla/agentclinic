@@ -15,14 +15,18 @@ Spec: [`2026-10-09-hello-hono`](./2026-10-09-hello-hono/)
 - First Vitest test for the home route
 - GitHub Actions CI (type-check + tests)
 
-## Phase 2: Agents & ailments
+## Phase 2: Agents & ailments — 🔍 In review (merge when CI is green and manual checks pass)
 
+Spec: [`2026-10-10-agents-ailments`](./2026-10-10-agents-ailments/)
+
+- PicoCSS adopted as the CSS foundation; existing layout and home page migrated
 - SQLite + Drizzle set up: `agents` and `ailments` schemas, plus the link between them;
   migrations and seed data
 - `/agents` page listing agents
 - `/agents/:id` page showing an agent's profile and their ailments
 - 404 page for unknown agents
 - `/ailments` page listing ailments
+- Header nav (Home, Agents, Ailments); home cards link to the new pages
 
 ## Phase 3: Therapies catalog
 
