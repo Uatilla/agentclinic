@@ -1,5 +1,5 @@
 // Data access for pages: plain objects in, plain objects out, so pages don't depend on Drizzle.
-import { asc, count, eq, inArray, sql } from 'drizzle-orm'
+import { asc, count, eq, inArray, sql, type Column } from 'drizzle-orm'
 import type { Db } from './client.ts'
 import {
   agentAilments,
@@ -7,6 +7,8 @@ import {
   ailments,
   therapies,
   therapyAilments,
+  effectivenessLevels,
+  severities,
   type Effectiveness,
   type Severity,
 } from './schema.ts'
@@ -66,7 +68,7 @@ export type AffectedAgent = {
   severity: Severity
 }
 
-export type AilmentDetail = {
+export type AilmentWithTherapiesAndAgents = {
   id: number
   name: string
   description: string
@@ -88,11 +90,16 @@ export const listAgents = (db: Db): AgentSummary[] =>
     .orderBy(asc(agents.name))
     .all()
 
-// Sort keys: worst severity and best effectiveness first
-const severityRank = sql`case ${agentAilments.severity}
-  when 'severe' then 0 when 'moderate' then 1 else 2 end`
-const effectivenessRank = sql`case ${therapyAilments.effectiveness}
-  when 'high' then 0 when 'medium' then 1 else 2 end`
+/** A sort key ranking `column`'s values in the given order (first value → 0). */
+const rankBy = (column: Column, order: readonly string[]) =>
+  sql`case ${column} ${sql.join(
+    order.map((value, rank) => sql`when ${value} then ${rank}`),
+    sql` `,
+  )} end`
+
+// Built from the enums (listed mildest/least first), so a new value can't be mis-ranked
+const severityRank = rankBy(agentAilments.severity, [...severities].reverse())
+const effectivenessRank = rankBy(therapyAilments.effectiveness, [...effectivenessLevels].reverse())
 
 /** Therapies for each of the given ailments, most effective first, keyed by ailment id. */
 const recommendationsFor = (db: Db, ailmentIds: number[]) => {
@@ -147,7 +154,10 @@ export const getAgentWithAilments = (db: Db, id: number): AgentWithAilments | un
  * The ailment with its therapies (most effective first) and the agents who have it
  * (most severe first); `undefined` for an unknown id.
  */
-export const getAilmentDetail = (db: Db, id: number): AilmentDetail | undefined => {
+export const getAilmentWithTherapiesAndAgents = (
+  db: Db,
+  id: number,
+): AilmentWithTherapiesAndAgents | undefined => {
   const ailment = db.select().from(ailments).where(eq(ailments.id, id)).get()
   if (!ailment) return undefined
 

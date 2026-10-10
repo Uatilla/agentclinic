@@ -1,4 +1,5 @@
 import { EffectivenessBadge } from '../components/EffectivenessBadge.tsx'
+import { RatedLink } from '../components/RatedLink.tsx'
 import type { TherapyWithAilments } from '../db/queries.ts'
 
 export type TherapyDetailProps = {
@@ -13,16 +14,19 @@ export const TherapyDetail = ({ therapy }: TherapyDetailProps) => (
     <article class="profile">
       <header>
         <h1>{therapy.name}</h1>
-        <p class="profile-model">{therapy.duration}</p>
+        <p class="profile-model">Duration: {therapy.duration}</p>
       </header>
       <p>{therapy.description}</p>
-      <h2>Treats</h2>
+      <h2>Ailments it treats</h2>
       {therapy.ailments.length > 0 ? (
-        <ul class="diagnoses">
+        <ul class="detail-list">
           {therapy.ailments.map(({ id, name, effectiveness }) => (
-            <li>
-              <a href={`/ailments/${id}`}>{name}</a>{' '}
-              <EffectivenessBadge effectiveness={effectiveness} />
+            <li class="rated-row">
+              <RatedLink
+                href={`/ailments/${id}`}
+                name={name}
+                badge={<EffectivenessBadge effectiveness={effectiveness} />}
+              />
             </li>
           ))}
         </ul>

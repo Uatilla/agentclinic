@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import {
   getAgentWithAilments,
-  getAilmentDetail,
+  getAilmentWithTherapiesAndAgents,
   getTherapyWithAilments,
   listAgents,
   listAilmentsWithCounts,
@@ -73,9 +73,9 @@ describe('listAilmentsWithCounts', () => {
   })
 })
 
-describe('getAilmentDetail', () => {
+describe('getAilmentWithTherapiesAndAgents', () => {
   test('returns the ailment, its therapies (most effective first) and affected agents', () => {
-    expect(getAilmentDetail(db, 1)).toEqual({
+    expect(getAilmentWithTherapiesAndAgents(db, 1)).toEqual({
       ...seedAilments.find(({ id }) => id === 1),
       therapies: [
         { id: 3, name: 'Grounding retreat', effectiveness: 'high' },
@@ -90,7 +90,7 @@ describe('getAilmentDetail', () => {
   })
 
   test('returns undefined for an unknown id', () => {
-    expect(getAilmentDetail(db, 9999)).toBeUndefined()
+    expect(getAilmentWithTherapiesAndAgents(db, 9999)).toBeUndefined()
   })
 })
 

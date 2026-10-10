@@ -18,9 +18,16 @@ All notable changes to this project, newest first.
   agents, ailments listed on therapy pages, and recommended therapies under each ailment on
   agent profiles, with graded effectiveness badges that meet WCAG AA and "No known cure — yet."
   empty states.
-- Grew the test suite to 184 Vitest tests, replacing the "no therapies" guards with booking,
-  dashboard and write-route guards; documented the pages in the README, marked Phases 3–4 done
-  in the roadmap, and allowed one branch per milestone in the tech stack.
+- Made ratings readable after a three-angle branch review: severity now uses a warm color scale
+  so it no longer looks like effectiveness, every badge tells screen readers what it measures,
+  profile therapy lists are labelled "Recommended therapies", badges stay next to their names,
+  the 404 page links every section, and therapy pages label their duration. Shared row and
+  badge components replace four copies of the same markup, and sort order now comes from the
+  enums.
+- Grew the test suite to 189 Vitest tests, replacing the "no therapies" guards with booking,
+  dashboard and write-route guards and adding tie-break, empty-state and accessibility checks;
+  documented the pages in the README, and allowed one branch per milestone in the tech stack
+  and mission.
 - Added the database: SQLite through Drizzle ORM and better-sqlite3 (its install script denied,
   since v13 ships prebuilt binaries), with `agents`, `ailments` and an `agent_ailments` join
   table whose severity is enforced by a database `CHECK`, committed migrations, and an

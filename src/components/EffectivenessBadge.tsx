@@ -1,4 +1,5 @@
 import type { Effectiveness } from '../db/schema.ts'
+import { Badge } from './Badge.tsx'
 
 export type EffectivenessBadgeProps = {
   effectiveness: Effectiveness
@@ -10,7 +11,6 @@ const labels: Record<Effectiveness, string> = {
   high: 'High',
 }
 
-// Same graded scale as severity: the text label carries the meaning, the class adds emphasis
 export const EffectivenessBadge = ({ effectiveness }: EffectivenessBadgeProps) => (
-  <span class={`badge badge-${effectiveness}`}>{labels[effectiveness]}</span>
+  <Badge level={effectiveness} label={labels[effectiveness]} measure="Effectiveness" />
 )

@@ -6,7 +6,7 @@ import { Layout } from './components/Layout.tsx'
 import type { Db } from './db/client.ts'
 import {
   getAgentWithAilments,
-  getAilmentDetail,
+  getAilmentWithTherapiesAndAgents,
   getTherapyWithAilments,
   listAgents,
   listAilmentsWithCounts,
@@ -69,7 +69,7 @@ export const createApp = (db: Db) => {
   )
 
   app.get('/ailments/:id{[0-9]+}', (c) => {
-    const ailment = getAilmentDetail(db, Number(c.req.param('id')))
+    const ailment = getAilmentWithTherapiesAndAgents(db, Number(c.req.param('id')))
     if (!ailment) return c.notFound()
     return c.html(
       <Layout title={`${ailment.name} · AgentClinic`} currentPath={c.req.path}>

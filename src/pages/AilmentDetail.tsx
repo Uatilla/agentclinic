@@ -1,9 +1,10 @@
 import { EffectivenessBadge } from '../components/EffectivenessBadge.tsx'
+import { RatedLink } from '../components/RatedLink.tsx'
 import { SeverityBadge } from '../components/SeverityBadge.tsx'
-import type { AilmentDetail as AilmentDetailData } from '../db/queries.ts'
+import type { AilmentWithTherapiesAndAgents } from '../db/queries.ts'
 
 export type AilmentDetailProps = {
-  ailment: AilmentDetailData
+  ailment: AilmentWithTherapiesAndAgents
 }
 
 export const AilmentDetail = ({ ailment }: AilmentDetailProps) => (
@@ -18,11 +19,14 @@ export const AilmentDetail = ({ ailment }: AilmentDetailProps) => (
       <p>{ailment.description}</p>
       <h2>Recommended therapies</h2>
       {ailment.therapies.length > 0 ? (
-        <ul class="diagnoses">
+        <ul class="detail-list">
           {ailment.therapies.map(({ id, name, effectiveness }) => (
-            <li>
-              <a href={`/therapies/${id}`}>{name}</a>{' '}
-              <EffectivenessBadge effectiveness={effectiveness} />
+            <li class="rated-row">
+              <RatedLink
+                href={`/therapies/${id}`}
+                name={name}
+                badge={<EffectivenessBadge effectiveness={effectiveness} />}
+              />
             </li>
           ))}
         </ul>
@@ -31,15 +35,19 @@ export const AilmentDetail = ({ ailment }: AilmentDetailProps) => (
       )}
       <h2>Affected agents</h2>
       {ailment.agents.length > 0 ? (
-        <ul class="diagnoses">
+        <ul class="detail-list">
           {ailment.agents.map(({ id, name, severity }) => (
-            <li>
-              <a href={`/agents/${id}`}>{name}</a> <SeverityBadge severity={severity} />
+            <li class="rated-row">
+              <RatedLink
+                href={`/agents/${id}`}
+                name={name}
+                badge={<SeverityBadge severity={severity} />}
+              />
             </li>
           ))}
         </ul>
       ) : (
-        <p>No agents affected.</p>
+        <p>No agents affected — for now.</p>
       )}
     </article>
   </>

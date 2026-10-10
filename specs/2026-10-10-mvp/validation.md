@@ -33,15 +33,15 @@ The MVP can merge to `main` when every box below is checked.
         high → low effectiveness.
   - [x] Empty states: an ailment with no therapies shows "No known cure — yet."; a therapy with
         no ailments shows its empty-state text.
-  - [ ] Every empty state in the requirements renders, including "No agents affected — for
+  - [x] Every empty state in the requirements renders, including "No agents affected — for
         now." and a zero-count therapy card ("Treats nothing in particular").
-  - [ ] Ties sort by name: therapies with the same effectiveness, and agents with the same
+  - [x] Ties sort by name: therapies with the same effectiveness, and agents with the same
         severity.
-  - [ ] Every badge has its hidden "Severity: " or "Effectiveness: " prefix; each profile
+  - [x] Every badge has its hidden "Severity: " or "Effectiveness: " prefix; each profile
         therapy list has a visible "Recommended therapies" label that names it.
-  - [ ] The 404 page links to `/agents`, `/ailments` and `/therapies`.
-  - [ ] Therapy pages show "Duration: …" and the heading "Ailments it treats".
-  - [ ] `/therapies/1.5` and `/ailments/1.5` return 404 too, and the 500 page has the header
+  - [x] The 404 page links to `/agents`, `/ailments` and `/therapies`.
+  - [x] Therapy pages show "Duration: …" and the heading "Ailments it treats".
+  - [x] `/therapies/1.5` and `/ailments/1.5` return 404 too, and the 500 page has the header
         nav.
   - [x] `GET /therapies/9999`, `/therapies/abc`, `/ailments/9999` and `/ailments/abc` return 404
         with the not-found page, marking no nav item.
@@ -53,7 +53,7 @@ The MVP can merge to `main` when every box below is checked.
       `<main>`, `<footer>`, viewport meta, stylesheets exactly Pico then `styles.css`, no
       `<script>`.
 - [x] Link integrity: every internal `href` on every page above returns 200.
-- [ ] Scope guard also covers `POST /ailments`.
+- [x] Scope guard also covers `POST /ailments`.
 - [x] Scope guard: no booking or dashboard routes (`/appointments`, `/dashboard` → 404) and no
       write routes (`POST /therapies`, `POST /agents` → 404).
 - [x] The GitHub Actions CI workflow is green on the `mvp` → `main` pull request (Node 24).
@@ -62,25 +62,33 @@ The MVP can merge to `main` when every box below is checked.
 ## Manual
 
 - [x] `npm run db:migrate && npm run db:seed && npm run dev` starts the app with seeded
-      therapies and matches.
-- [x] New `drizzle/` migrations are committed.
+      therapies and matches. (Run after groups 1, 3, 4, 5, 6 and 8; seed reports 6 therapies
+      and 10 therapy matches.)
+- [x] New `drizzle/` migrations are committed. (`0001_therapies.sql`,
+      `0002_therapy_ailments.sql`, with snapshots and journal.)
 - [ ] Walkthrough in a current evergreen browser: home → Agents → an agent → one of their
       ailments → a recommended therapy → back to the ailment, using only links.
 - [ ] New pages look consistent with Phase 2 pages; effectiveness badges are readable in light
       and dark mode.
-- [ ] Contrast (WCAG AA, 4.5:1) measured for the warm severity badges in light and dark mode.
-- [ ] On an agent profile, severity and effectiveness badges are easy to tell apart, and each
-      badge stays next to its name at 320px and 1280px.
+- [x] Contrast (WCAG AA, 4.5:1) measured for the warm severity badges in light and dark mode.
+      (Computed from the CSS colors: light Moderate 5.83, Severe 6.12; dark Moderate 7.55,
+      Severe 6.73; Mild unchanged from Phase 2.)
+- [x] On an agent profile, severity and effectiveness badges are easy to tell apart, and each
+      badge stays next to its name at 320px and 1280px. (Headless Chromium screenshots of
+      `/agents/5` at 320px light and 1280px dark, group 8.)
 - [x] Contrast (WCAG AA, 4.5:1) checked for each effectiveness badge in light and dark mode.
       (Computed from the CSS colors: light High 4.83, Medium 4.73, Low 8.33; dark High 5.15,
       Medium 5.72, Low 8.98.)
 - [ ] Seed therapies and empty-state copy match the tone (playful but polished).
-- [x] Responsive at each reference width, on every new or changed page:
+- [x] Responsive at each reference width, on every new or changed page (headless Chromium
+      screenshots at 320, 768 and 1280px, light and dark, in groups 3, 5, 6 and 8):
   - [x] 320px: no horizontal scroll; header nav with four links wraps without overflow; agent
         profile recommendations stay readable.
   - [x] 768px: layout uses the extra width; nothing overflows.
   - [x] 1280px: content centered within the max width.
-  - [x] Nav links, cards and therapy links are at least 44×44px touch targets.
+  - [x] Nav links, cards and therapy links are at least 44×44px touch targets. (CSS:
+        `min-height`/`min-width: 44px` on nav links, `min-height: 44px` on detail-list and back
+        links; linked cards are covered by their title link.)
 - [x] README, roadmap and tech-stack reflect the MVP.
 - [x] `CHANGELOG.md` has an entry for the MVP.
 - [x] `prompts.md` has concise, reusable SDD lessons from this MVP.
