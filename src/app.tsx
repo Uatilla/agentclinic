@@ -5,6 +5,10 @@ import { Home } from './pages/Home.tsx'
 
 export const app = new Hono()
 
+app.get(
+  '/public/vendor/pico.min.css',
+  serveStatic({ path: './node_modules/@picocss/pico/css/pico.min.css' }),
+)
 app.use('/public/*', serveStatic({ root: './' }))
 
 app.get('/', (c) =>

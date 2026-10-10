@@ -38,9 +38,12 @@ describe('GET /', () => {
     expect(html).toContain('<meta name="viewport" content="width=device-width, initial-scale=1"/>')
   })
 
-  test('links the stylesheet', async () => {
+  test('links Pico before the overrides stylesheet', async () => {
     const html = await (await get()).text()
-    expect(html).toContain('<link rel="stylesheet" href="/public/styles.css"/>')
+    const pico = html.indexOf('<link rel="stylesheet" href="/public/vendor/pico.min.css"/>')
+    const styles = html.indexOf('<link rel="stylesheet" href="/public/styles.css"/>')
+    expect(pico).toBeGreaterThan(-1)
+    expect(styles).toBeGreaterThan(pico)
   })
 
   test('ships no client-side JavaScript or links to missing routes', async () => {
@@ -50,8 +53,13 @@ describe('GET /', () => {
   })
 })
 
-test('GET /public/styles.css is served', async () => {
-  const res = await app.request('/public/styles.css')
-  expect(res.status).toBe(200)
-  expect(res.headers.get('content-type')).toMatch(/^text\/css/)
+describe('stylesheets', () => {
+  test.each(['/public/vendor/pico.min.css', '/public/styles.css'])(
+    'GET %s is served locally as CSS',
+    async (path) => {
+      const res = await app.request(path)
+      expect(res.status).toBe(200)
+      expect(res.headers.get('content-type')).toMatch(/^text\/css/)
+    },
+  )
 })

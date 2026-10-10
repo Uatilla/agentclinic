@@ -17,6 +17,7 @@ export const Layout = ({ title = 'AgentClinic', children }: LayoutProps) => (
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{title}</title>
+        <link rel="stylesheet" href="/public/vendor/pico.min.css" />
         <link rel="stylesheet" href="/public/styles.css" />
       </head>
       <body>

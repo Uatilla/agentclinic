@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^2.1.4",
+    "@picocss/pico": "^2.1.1",
     "hono": "^4.13.13"
   },
   "devDependencies": {

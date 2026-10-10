@@ -28,6 +28,10 @@ describe('project structure', () => {
     expect(pkg.engines.node).toBe('>=24')
   })
 
+  test('installs PicoCSS from npm', () => {
+    expect(pkg.dependencies['@picocss/pico']).toBeDefined()
+  })
+
   test('exposes the validate script', () => {
     expect(pkg.scripts.validate).toBe('npm run typecheck && npm test')
   })

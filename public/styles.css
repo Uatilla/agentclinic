@@ -1,67 +1,67 @@
-:root {
-  --bg: #f7f9fc;
-  --surface: #ffffff;
-  --text: #1c2433;
-  --muted: #5b6678;
-  --accent: #2a9d8f;
+/* Overrides on top of PicoCSS (/public/vendor/pico.min.css). Pico owns reset, typography,
+   base colors and dark mode; this file sets the brand and adds what Pico lacks. */
+
+/* Brand: AgentClinic teal, light and dark (same selectors Pico uses for its themes) */
+[data-theme='light'],
+:root:not([data-theme='dark']) {
+  --pico-primary: #21867a;
+  --pico-primary-background: #21867a;
+  --pico-primary-border: var(--pico-primary-background);
+  --pico-primary-underline: rgba(33, 134, 122, 0.5);
+  --pico-primary-hover: #1a6b61;
+  --pico-primary-hover-background: #1a6b61;
+  --pico-primary-hover-border: var(--pico-primary-hover-background);
+  --pico-primary-hover-underline: var(--pico-primary-hover);
+  --pico-primary-focus: rgba(33, 134, 122, 0.4);
+  --pico-primary-inverse: #fff;
   --accent-soft: #e3f4f2;
-  --border: #dde3ec;
-  --radius: 12px;
-  --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #12161f;
-    --surface: #1b212d;
-    --text: #e6eaf2;
-    --muted: #9aa5b8;
-    --accent: #4fc3b4;
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --pico-primary: #4fc3b4;
+    --pico-primary-background: #2a9d8f;
+    --pico-primary-border: var(--pico-primary-background);
+    --pico-primary-underline: rgba(79, 195, 180, 0.5);
+    --pico-primary-hover: #7dd6ca;
+    --pico-primary-hover-background: #21867a;
+    --pico-primary-hover-border: var(--pico-primary-hover-background);
+    --pico-primary-hover-underline: var(--pico-primary-hover);
+    --pico-primary-focus: rgba(79, 195, 180, 0.4);
+    --pico-primary-inverse: #fff;
     --accent-soft: #1d3a37;
-    --border: #2b3343;
   }
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+[data-theme='dark'] {
+  --pico-primary: #4fc3b4;
+  --pico-primary-background: #2a9d8f;
+  --pico-primary-border: var(--pico-primary-background);
+  --pico-primary-underline: rgba(79, 195, 180, 0.5);
+  --pico-primary-hover: #7dd6ca;
+  --pico-primary-hover-background: #21867a;
+  --pico-primary-hover-border: var(--pico-primary-hover-background);
+  --pico-primary-hover-underline: var(--pico-primary-hover);
+  --pico-primary-focus: rgba(79, 195, 180, 0.4);
+  --pico-primary-inverse: #fff;
+  --accent-soft: #1d3a37;
 }
 
+/* Sticky footer and long-word safety */
 body {
-  margin: 0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font);
-  line-height: 1.6;
   overflow-wrap: break-word;
 }
 
-img,
-svg,
-video {
-  max-width: 100%;
-  height: auto;
-}
-
-main {
+body > main {
   flex: 1;
 }
 
-.container {
-  width: 100%;
-  max-width: 64rem;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
+/* Header */
 .site-header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 1rem 0;
+  border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
 }
 
 .brand {
@@ -70,71 +70,77 @@ main {
 }
 
 .brand-mark {
-  color: var(--accent);
+  color: var(--pico-primary);
 }
 
+/* Footer */
 .site-footer {
-  border-top: 1px solid var(--border);
-  color: var(--muted);
+  border-top: var(--pico-border-width) solid var(--pico-muted-border-color);
+  color: var(--pico-muted-color);
   font-size: 0.875rem;
-  padding: 1.5rem 0;
-  margin-top: 3rem;
 }
 
+.site-footer p {
+  margin: 0;
+}
+
+/* Hero */
 .hero {
-  padding: 2.5rem 0 1.5rem;
+  padding: 1.5rem 0 0.5rem;
   text-align: center;
 }
 
 @media (min-width: 40rem) {
   .hero {
-    padding: 4rem 0 2rem;
+    padding: 3rem 0 1rem;
   }
 }
 
 .hero h1 {
   font-size: clamp(2rem, 6vw, 3rem);
   line-height: 1.15;
-  margin: 0 0 1rem;
 }
 
 .hero p {
-  color: var(--muted);
+  color: var(--pico-muted-color);
   font-size: clamp(1rem, 2.5vw, 1.125rem);
   max-width: 40rem;
-  margin: 0 auto;
+  margin-inline: auto;
 }
 
+/* Card grid: reflows 1 → 2 → 3 columns (Pico's .grid jumps from 1 to all columns) */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
   gap: 1.25rem;
-  padding: 2rem 0;
+  padding: 1rem 0;
   margin: 0;
+}
+
+.cards > li {
   list-style: none;
+  margin: 0;
 }
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.5rem;
+.cards article {
+  height: 100%;
+  margin: 0;
 }
 
-.card h2 {
+.cards h2 {
   font-size: 1.25rem;
-  margin: 0 0 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
-.card p {
-  color: var(--muted);
-  margin: 0 0 1rem;
+.cards p {
+  color: var(--pico-muted-color);
 }
 
+/* Badges (e.g. "Coming soon", severity) */
 .badge {
   display: inline-block;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--pico-primary);
   border-radius: 999px;
   padding: 0.125rem 0.75rem;
   font-size: 0.8125rem;

@@ -1,4 +1,6 @@
-const teasers = [
+import { TeaserCard, type TeaserCardProps } from '../components/TeaserCard.tsx'
+
+const teasers: TeaserCardProps[] = [
   {
     title: 'Agents',
     description: 'Meet the patients: chatbots, copilots and assistants in need of a break.',
@@ -23,12 +25,8 @@ export const Home = () => (
       </p>
     </section>
     <ul class="cards">
-      {teasers.map(({ title, description }) => (
-        <li class="card">
-          <h2>{title}</h2>
-          <p>{description}</p>
-          <span class="badge">Coming soon</span>
-        </li>
+      {teasers.map((teaser) => (
+        <TeaserCard {...teaser} />
       ))}
     </ul>
   </>
