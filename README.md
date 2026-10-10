@@ -1,5 +1,12 @@
 # AgentClinic
 
+Built as the course project for
+[Spec-Driven Development with Coding Agents](https://www.deeplearning.ai/courses/spec-driven-development-with-coding-agents)
+by DeepLearning.AI.
+
+- Certificate: _link coming soon_
+- Study notes: [SDD guide](./prompts.md) and [OpenSpec guide](./OpenSpec_Guide.md)
+
 ## Input from stakeholders
 
 - Mary in engineering wants a reliable site with a popular stack based on TypeScript, giving agents and staff a dashboard for easy access.
