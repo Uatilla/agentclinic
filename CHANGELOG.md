@@ -19,6 +19,11 @@ All notable changes to this project, newest first.
   baseline on every page, link integrity (every internal link returns 200) replacing Phase 1's
   no-links guard, and scope guards for therapies and write routes.
 - Added a getting-started section to the README covering the database scripts.
+- Amended the Phase 2 spec after a second, whole-branch review: decisions made during
+  implementation are now recorded, a review-fixes plan group was added, and validation gained
+  checks for cascade deletes, unique ailment names, empty and error states. `DATABASE_URL` is
+  now read the same way by the app and drizzle-kit, and every check verified during the build is
+  ticked, with Phase 2 marked "in review" until CI and the manual checks pass.
 - Adopted PicoCSS v2 as the product-wide CSS foundation: installed from npm and served locally,
   with `styles.css` reduced to brand overrides, the card grid and badges; home teaser cards are
   now Pico `<article>`s. After review, the brand teal and badges meet WCAG AA contrast in
