@@ -1,79 +1,89 @@
-# SDD — Lesson 04: The Constitution
+# SDD — Spec-Driven Development guide
 
-## Core idea
-Specs (Markdown in `specs/`) are the source of truth; code follows them.
-They give the agent persistent context across sessions and make decisions reviewable.
+Specs (Markdown in `specs/`) are the source of truth: code follows them, every session and
+agent shares context through them, and every decision stays reviewable in git.
+**Change the spec before the code.**
 
-## SDD workflow (end to end)
-🧹 = clear context · ⏸ = keep context
-1. **Constitution** — mission, tech stack, roadmap (tiny phases). Commit.
-   🧹 after commit: everything now lives on disk.
-2. **Pick next phase** — from the roadmap; create one branch per phase (or per milestone).
-   ⏸ go straight into the spec.
-3. **Feature spec** — dated dir in `specs/`: `requirements.md` (scope, decisions, context),
-   `plan.md` (numbered task groups), `validation.md` (merge bar). Ask before writing.
-   ⏸ the reasons behind the answers are still fresh for the review.
-4. **Review the spec** — highest-leverage moment: fix ambiguity, hidden assumptions,
-   untestable checks, scope creep. Commit the spec before any code.
-   🧹 after commit: implementation must work from the spec alone.
-5. **Implement** — one task group at a time; check, commit, repeat.
-   ⏸ while fixing failures inside a group · 🧹 between groups, after commit.
-6. **Validate** — run `validation.md`; fix gaps in the same session.
-   🧹 before: a fresh reviewer has no bias from the session that wrote the code · ⏸ while fixing.
-7. **Merge** — PR shows spec + code; CI green → merge to `main`.
-8. **Update & replan** — mark the phase done in the roadmap, then replan (see below), commit.
-   🧹 then go to step 2.
+## Key concepts
+| Term | Meaning |
+|---|---|
+| Constitution | Project-wide, long-lived specs: mission, tech stack, roadmap |
+| Phase | One small, user-visible slice from the roadmap, mergeable on its own |
+| Milestone | Consecutive phases that only make sense together: one branch, a checkpoint per phase |
+| Feature spec | Dated folder with requirements, plan and validation for one phase/milestone |
+| Plan group | A numbered set of tasks that ends with a **Check** and leaves the repo working |
+| Checkpoint | A stop after a finished phase to test it before building on it |
+| Amendment | A dated note + edits to a spec when reality differs from the plan |
+| Merge bar | `validation.md`: every box ticked, each with evidence (test, measure, CI run, person) |
+| Replan | Short roadmap review after each merge, before the next spec |
 
-## Implementation loop (lessons)
-- **Re-review the spec after the first slice:** building one group exposes gaps (ordering,
-  empty states, placeholder data). Amend the spec with a dated note, commit, then continue.
-- **Per group:** build → test → fix plan → fix (repeat only if drifting from the plan) →
-  summary linked to plan + validation items → ask before the next group.
-- **Old tests failing on purpose is normal:** when the spec changes behavior, updating those
-  tests *is* following the spec.
-- **Automated ≠ done:** keep manual checks for look and layout; tests can pass on a broken page.
-- **Expected values come from fixtures/spec,** never from the code under test.
-- **Milestones:** consecutive phases that only make sense together can share one spec and
-  branch, built in phase order with a checkpoint between them.
+## Repository layout
+    specs/
+      mission.md          why, for whom, scope, principles
+      tech-stack.md       language, frameworks, quality rules, conventions
+      roadmap.md          phases in order (+ backlog), each linked to its spec
+      YYYY-MM-DD-<name>/
+        requirements.md   context, scope in/out, decisions table (+ amendment notes)
+        plan.md           numbered task groups, each with a Check
+        validation.md     automated + manual checks = the merge bar
+    CHANGELOG.md          what changed, per date, in plain language
 
-## Constitution = project-wide, long-lived specs
-- `mission.md` — why / for whom → resolves ambiguous choices
-- `tech-stack.md` — built with what → keeps the stack consistent
-- `roadmap.md` — in what order → very small phases (small spec, small diff, easy review)
+## Workflow
+🧹 clear context (only when the next step is fully on disk) · ⏸ keep context
 
-### Changing the constitution
-- Default: own branch (from `main`) and own PR, because it guides every future phase,
-  deserves its own review, and stays visible in history.
-- Exception: if the feature depends on the change, ship both in the same PR (or merge the
-  constitution first, then rebase), so code never breaks a rule `main` doesn't have yet.
+| # | Step | Files | Done when | Context |
+|---|---|---|---|---|
+| 1 | Constitution | `mission`, `tech-stack`, `roadmap` | Committed | 🧹 after |
+| 2 | Pick next phase | branch (one per phase or milestone) | Branch created | ⏸ |
+| 3 | Feature spec | `requirements`, `plan`, `validation` | Questions answered, files written | ⏸ |
+| 4 | Review the spec | same 3 files (amendment) | Gaps fixed, spec committed before code | 🧹 after |
+| 5 | Implement | code + tests, one group per commit | Every group's Check passes | ⏸ in group, 🧹 between |
+| 6 | Validate | review findings → amendment → fix group; `validation.md` | Every box ticked with evidence | 🧹 before |
+| 7 | Merge | pull request | CI green on the PR, merged | — |
+| 8 | Update & replan | `roadmap` (done after merge), `CHANGELOG`, notes | Replan committed | 🧹 → step 2 |
 
-### Replanning between phases
-- Replan after every merge, before the next spec: lessons from the last phase reshape the next.
-- Keep it short: what changes the next phase? Adjust scope, split/merge/reorder phases;
-  touch mission/tech stack only if a rule changed. "Roadmap still holds" is a valid outcome.
-- Commit the replan on its own, so it shows up in history.
-- Pitfalls: churn (rewriting everything), scope creep (new ideas go to the backlog),
-  replanning mid-phase (instead, amend that phase's spec with a dated note).
+## Best practices
+**Specs**
+- Tiny phases: small spec, small diff, easy review.
+- Decisions table: choice + *why*, so later readers (and agents) don't reopen them.
+- Review the spec carefully before coding; re-review after the first group only if the phase
+  is large or unfamiliar, or the first group surprised you.
+- Never let code drift: amend the spec (dated note), commit, then change code.
 
-## Prompt pattern
-> Give context (one-line intent + where the requirements live).
-> Create a constitution in `specs/`: mission, tech-stack, roadmap (very small phases).
+**Implementation**
+- One group at a time: build → test → fix → commit → summary → ask before the next.
+- Every group leaves the repo working; tests run on every commit.
+
+**Testing**
+- Expected values come from the spec/fixtures, never from the code under test.
+- Old tests failing after a spec change is expected: updating them *is* following the spec.
+- Automated ≠ done: manual checks catch look and layout; tests can pass on a broken page.
+- Prove a test catches the problem: break the code briefly and watch it fail.
+
+**Review**
+- Always review in a fresh context; for milestones or risky changes, use several angles
+  (spec conformance, code/tests, UX/accessibility), since each finds different problems.
+  Verify findings before acting on them.
+
+## Changing the constitution
+- Own branch and PR by default (it governs every phase).
+- If a feature depends on the change: ship both together, or merge the constitution first.
+
+## Replanning
+- After every merge, before the next spec: what changes the next phase?
+  "Roadmap still holds" is a valid answer.
+- Touch mission/tech stack only if a rule changed. New ideas → backlog.
+  Mid-phase changes → amend that phase's spec instead.
+- Commit the replan on its own.
+
+## Working with an agent
+Prompt pattern:
+> One-line intent + where the requirements live. Create/update <files> in `specs/`.
 > You *must* use AskUserQuestion, grouped per file, before writing to disk.
 
-- **Ask before writing:** the agent surfaces its assumptions and you make the decisions (human in the loop).
-- **Grouped per file:** focused rounds of questions.
-- **Refine with small follow-ups**, editing the spec rather than the code
-  (e.g. "add a target audience to the mission", "add SQLite to the tech stack").
-
-## When to clear context
-Rule: clear when the next step can be fully described by files on disk.
-- ✅ Between steps: constitution → feature spec → implement → validate → next feature.
-- ✅ Before validation: a fresh context reviews without bias from the session that wrote the code.
-- ❌ For small fixes within a feature: stay in the session, since the failure details are already in context.
-- 🔄 For a change of direction: update the spec, commit, then clear.
-- Never clear with uncommitted work or decisions that exist only in the chat.
-
-## Takeaways
-- Spec first, code second; change the spec before the code.
-- Keep phases tiny.
-- Commit `specs/` so any agent or session can pick up where the last left off.
+Rules for the agent:
+- Ask before writing specs; surface assumptions, let the human decide.
+- Follow the plan one group at a time; report results and ask before the next group.
+- If the code must differ from the spec, propose an amendment first.
+- Tick validation boxes only with evidence; never merge before every box is ticked.
+- Confirm before outward actions (push, PR, merge, deleting branches).
