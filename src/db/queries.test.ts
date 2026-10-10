@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'vitest'
-import { getAgentWithAilments, listAgents, listAilmentsWithCounts } from './queries.ts'
-import { seedAgents, seedAilments } from './seed.ts'
+import {
+  getAgentWithAilments,
+  getTherapy,
+  listAgents,
+  listAilmentsWithCounts,
+  listTherapies,
+} from './queries.ts'
+import { seedAgents, seedAilments, seedTherapies } from './seed.ts'
 import { createTestDb } from './test-db.ts'
 
 const db = createTestDb()
@@ -48,5 +54,29 @@ describe('listAilmentsWithCounts', () => {
       Sycophancy: 2,
       'Token anxiety': 2,
     })
+  })
+})
+
+describe('listTherapies', () => {
+  test('returns every seeded therapy, sorted by name', () => {
+    const list = listTherapies(db)
+    expect(list).toHaveLength(seedTherapies.length)
+    expect(list.map(({ name }) => name)).toEqual(seedTherapies.map(({ name }) => name).sort())
+    expect(list[0]).toEqual({
+      id: expect.any(Number),
+      name: expect.any(String),
+      description: expect.any(String),
+      duration: expect.any(String),
+    })
+  })
+})
+
+describe('getTherapy', () => {
+  test('returns the therapy', () => {
+    expect(getTherapy(db, 3)).toEqual(seedTherapies.find(({ id }) => id === 3))
+  })
+
+  test('returns undefined for an unknown id', () => {
+    expect(getTherapy(db, 9999)).toBeUndefined()
   })
 })

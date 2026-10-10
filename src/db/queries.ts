@@ -1,7 +1,7 @@
 // Data access for pages: plain objects in, plain objects out, so pages don't depend on Drizzle.
 import { asc, count, eq, sql } from 'drizzle-orm'
 import type { Db } from './client.ts'
-import { agentAilments, agents, ailments, type Severity } from './schema.ts'
+import { agentAilments, agents, ailments, therapies, type Severity } from './schema.ts'
 
 export type AgentSummary = {
   id: number
@@ -18,6 +18,13 @@ export type AgentAilment = {
 export type AgentWithAilments = AgentSummary & {
   bio: string
   ailments: AgentAilment[]
+}
+
+export type Therapy = {
+  id: number
+  name: string
+  description: string
+  duration: string
 }
 
 export type AilmentWithCount = {
@@ -65,3 +72,10 @@ export const listAilmentsWithCounts = (db: Db): AilmentWithCount[] =>
     .groupBy(ailments.id)
     .orderBy(asc(ailments.name))
     .all()
+
+export const listTherapies = (db: Db): Therapy[] =>
+  db.select().from(therapies).orderBy(asc(therapies.name)).all()
+
+/** The therapy; `undefined` for an unknown id. */
+export const getTherapy = (db: Db, id: number): Therapy | undefined =>
+  db.select().from(therapies).where(eq(therapies.id, id)).get()
