@@ -15,7 +15,7 @@ Spec: [`2026-10-09-hello-hono`](./2026-10-09-hello-hono/)
 - First Vitest test for the home route
 - GitHub Actions CI (type-check + tests)
 
-## Phase 2: Agents & ailments — 🚧 In progress
+## Phase 2: Agents & ailments — 🔍 In review (merge when CI is green and manual checks pass)
 
 Spec: [`2026-10-10-agents-ailments`](./2026-10-10-agents-ailments/)
 

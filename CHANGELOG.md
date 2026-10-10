@@ -4,6 +4,21 @@ All notable changes to this project, newest first.
 
 ## 2026-10-10
 
+- Added the database: SQLite through Drizzle ORM and better-sqlite3 (its install script denied,
+  since v13 ships prebuilt binaries), with `agents`, `ailments` and an `agent_ailments` join
+  table whose severity is enforced by a database `CHECK`, committed migrations, and an
+  idempotent seed of 5 agents, 6 ailments and 11 diagnoses.
+- Added the first data-driven pages: `/agents`, agent profiles at `/agents/:id` with graded
+  severity badges and a "Clean bill of health." empty state, `/ailments` with how many agents
+  have each, a playful 404 and a 500 page inside the layout.
+- Added a header nav that marks the current section, a compact phone header, and home cards
+  that link to Agents and Ailments while Therapies stays "Coming soon".
+- Tightened accessibility after a second review: dark-mode muted text and keyboard focus
+  outlines now meet WCAG AA, and error pages no longer mark a nav section as current.
+- Grew the test suite to 93 Vitest tests: an in-memory database per test file, a shared page
+  baseline on every page, link integrity (every internal link returns 200) replacing Phase 1's
+  no-links guard, and scope guards for therapies and write routes.
+- Added a getting-started section to the README covering the database scripts.
 - Adopted PicoCSS v2 as the product-wide CSS foundation: installed from npm and served locally,
   with `styles.css` reduced to brand overrides, the card grid and badges; home teaser cards are
   now Pico `<article>`s. After review, the brand teal and badges meet WCAG AA contrast in
