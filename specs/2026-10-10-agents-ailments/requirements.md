@@ -67,6 +67,7 @@ so this phase also migrates the existing layout and home page to it.
 | Agent ↔ ailment relationship | Many-to-many via `agent_ailments`, with `severity` | One ailment affects many agents (needed for Phase 4 matching); severity adds product value and fits the tone |
 | Severity values | Text column with Drizzle `text({ enum })` plus a `check()` constraint (`severity IN ('mild','moderate','severe')`) | `enum` only narrows the TypeScript type; the `CHECK` makes SQLite reject bad values too. Readable in the DB |
 | SQLite driver | `better-sqlite3` | Most common, stable Drizzle + drizzle-kit pairing; synchronous; prebuilt binaries for Node 24 |
+| Install scripts | `"allowScripts": { "better-sqlite3": false }` in `package.json` (npm 11) | v13 bundles prebuilt binaries, so its `node-gyp rebuild` script isn't needed; denying it runs no package code at install time and records the choice. A test opens an in-memory DB, so a release without a binary for the platform fails fast |
 | Migrations | `drizzle-kit generate`; SQL files committed in `drizzle/`; applied with Drizzle's migrator | Schema history is reviewable in PRs; the same migrations run locally and in tests |
 | DB file | `data/agentclinic.db`, path from `DATABASE_URL` (default above), git-ignored; `createDb` creates the parent directory | No binary data in git; easy to reset; works on a fresh clone (better-sqlite3 doesn't create directories) |
 | Seeding | `npm run db:seed` script, idempotent (clears and re-inserts) | Repeatable local setup |

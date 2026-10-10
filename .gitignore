@@ -9,3 +9,5 @@ yarn-error.log*
 .pnp.js
 
 .vscode/*
+# Local SQLite database (created by db:migrate / the app)
+/data
