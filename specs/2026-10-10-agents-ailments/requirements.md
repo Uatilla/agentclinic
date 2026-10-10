@@ -24,6 +24,7 @@ so this phase also migrates the existing layout and home page to it.
   - `Layout` links Pico first, then `public/styles.css`.
   - Layout and home page use Pico's semantic patterns (`.container`, `<nav>`, `<article>`
     cards); the current look stays the same or better (teal brand, light/dark, content width).
+  - Static files are resolved from the module, so styles load wherever the server starts.
   - `public/styles.css` shrinks to overrides: brand colors via `--pico-*` variables, the card
     grid, badges (with their own `--badge-*` tokens).
   - Text and controls meet WCAG AA contrast (4.5:1) in light and dark mode.
@@ -79,7 +80,7 @@ so this phase also migrates the existing layout and home page to it.
 | CSS foundation | PicoCSS v2, default build (`pico.min.css`, not classless) | Semantic HTML gets polished styles, mobile-first and dark mode for free; the default build also gives `.container` and `.grid` |
 | Pico delivery | npm `@picocss/pico`, served from `node_modules` at `/public/vendor/pico.min.css` | Version pinned in the lockfile; no third-party request; route-testable |
 | Brand color | Phase 1 teal family via `--pico-primary*` overrides: light `#1f7f74` (darkened from `#2a9d8f`), dark `#4fc3b4` with dark text on teal buttons | Keeps the brand without a custom Pico build; the original teal fails AA contrast on white (3.3:1) |
-| Content width | Cap `.container` at `64rem`, as in Phase 1; hero headline `clamp()` capped in `rem` | Pico's container grows to 1450px and its root font to 125%, which made lines and the headline too large |
+| Content width | Cap `.container` at `1024px` (Phase 1's `64rem`) from 1280px up; hero headline capped at `48px` | Pico's container grows to 1450px and its root font to 125%, so `rem` caps would grow too; below 1280px Pico's own widths keep side margins (its `.container` has no side padding from 576px) |
 | Custom CSS | `public/styles.css` keeps only overrides and components Pico lacks | Less CSS to maintain; Pico stays the single source of base styles |
 | Cards | Pico `<article>` inside the existing `auto-fit` card grid; card components return the `<article>` and the page wraps it in `<li>` | Pico's `.grid` collapses to one column below 768px but doesn't reflow to 2 columns; the custom grid does. Card components stay reusable outside lists |
 | Props types | Component props use a named, extracted type (`type FooProps`), per [`tech-stack.md`](../tech-stack.md) | Readable signatures; data arrays can reuse the type |

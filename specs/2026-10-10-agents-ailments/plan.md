@@ -7,9 +7,12 @@ Every group must leave the repo working.
 
 1. Install `@picocss/pico` (v2).
 2. Serve `node_modules/@picocss/pico/css/pico.min.css` at `/public/vendor/pico.min.css`
-   (`serveStatic` with its `path` option), registered before the `/public/*` handler.
+   (`serveStatic` with its `path` option), registered before the `/public/*` handler. Resolve
+   both from the module, not the working directory:
+   `require.resolve('@picocss/pico/css/pico.min.css')` and `public/` via `import.meta.url`.
 3. In `Layout.tsx`, link Pico first, then `/public/styles.css`.
-4. Move the layout to Pico patterns: `.container` (capped at `64rem`) for page width, and a
+4. Move the layout to Pico patterns: `.container` (capped at `1024px` from 1280px up) for page
+   width, and a
    `TeaserCard` component (extracted `TeaserCardProps`) that returns a Pico `<article>`; the
    page wraps each card in `<li>`.
 5. Shrink `public/styles.css` to overrides: `--pico-primary*` set to the brand teal (light
@@ -54,9 +57,8 @@ severity `CHECK`).
 ## 4. App factory and data access
 
 1. Refactor `src/app.tsx` to export only `createApp(db)` (nothing opened on import);
-   `src/index.ts` creates the file DB and passes it. Resolve static paths from the module
-   (`require.resolve('@picocss/pico/css/pico.min.css')`, `public/` via `import.meta.url`), so
-   styles load from any working directory.
+   `src/index.ts` creates the file DB and passes it. Keep the module-resolved static paths
+   from group 1.
 2. Update `src/app.test.tsx` to build the app from the test DB; Phase 1 tests stay green.
 3. Create `src/db/queries.ts`: `listAgents`, `getAgentWithAilments(id)`,
    `listAilmentsWithCounts`, with unit tests.

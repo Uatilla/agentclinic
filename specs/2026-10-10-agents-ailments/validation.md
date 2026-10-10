@@ -59,10 +59,11 @@ The phase can merge to `main` when every box below is checked.
 - [ ] `public/styles.css` contains only overrides and Pico-missing components (review only).
 - [ ] Contrast (WCAG AA, 4.5:1) checked with a contrast checker in light and dark mode: links,
       badge text on badge background, text on primary buttons, muted footer text.
-- [ ] Footer text is muted; at 1280px the content is at most `64rem` wide and the headline
-      matches Phase 1's size.
-- [ ] Starting the server from another directory (`cd /tmp && npx tsx <repo>/src/index.ts`)
-      still serves both stylesheets.
+- [ ] Footer text is muted; at 1280px the content is at most `1024px` wide and the headline
+      is `48px`, as in Phase 1.
+- [ ] Starting the server from another directory still serves the page and both stylesheets:
+      `cd /tmp && <repo>/node_modules/.bin/tsx --tsconfig <repo>/tsconfig.json <repo>/src/index.ts`
+      (`--tsconfig` because `tsx` reads it from the working directory, for the JSX settings).
 - [ ] Seed data and 404 copy match the tone (playful but polished).
 - [ ] Responsive (browser dev tools), on every new page, at each reference width from
       `tech-stack.md`:

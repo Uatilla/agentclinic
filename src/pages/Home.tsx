@@ -26,7 +26,9 @@ export const Home = () => (
     </section>
     <ul class="cards">
       {teasers.map((teaser) => (
-        <TeaserCard {...teaser} />
+        <li>
+          <TeaserCard {...teaser} />
+        </li>
       ))}
     </ul>
   </>

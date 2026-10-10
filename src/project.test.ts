@@ -28,8 +28,8 @@ describe('project structure', () => {
     expect(pkg.engines.node).toBe('>=24')
   })
 
-  test('installs PicoCSS from npm', () => {
-    expect(pkg.dependencies['@picocss/pico']).toBeDefined()
+  test('installs PicoCSS v2 from npm', () => {
+    expect(pkg.dependencies['@picocss/pico']).toMatch(/^\^?2\./)
   })
 
   test('exposes the validate script', () => {

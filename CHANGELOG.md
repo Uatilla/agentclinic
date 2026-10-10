@@ -2,6 +2,21 @@
 
 All notable changes to this project, newest first.
 
+## 2026-10-10
+
+- Adopted PicoCSS v2 as the product-wide CSS foundation: installed from npm and served locally,
+  with `styles.css` reduced to brand overrides, the card grid and badges; home teaser cards are
+  now Pico `<article>`s. After review, the brand teal and badges meet WCAG AA contrast in
+  light and dark mode, the footer is muted again, content width and headline size match
+  Phase 1, styles load wherever the server starts, and tests check the exact stylesheet list
+  with no external URLs.
+- Added a convention that component props use a named, extracted TypeScript type, starting with
+  a new `TeaserCard` component.
+- Wrote the Phase 2 feature spec (Agents & ailments: SQLite + Drizzle, agent and ailment pages,
+  404, header nav), then amended it after a three-angle review: database-enforced severity,
+  WCAG AA contrast, fixed content width, cwd-independent static paths and sharper validation
+  checks.
+
 ## 2026-10-09
 
 - Added a `/changelog` skill that builds this file from git history, to run before each merge.

@@ -1,20 +1,22 @@
 /* Overrides on top of PicoCSS (/public/vendor/pico.min.css). Pico owns reset, typography,
-   base colors and dark mode; this file sets the brand and adds what Pico lacks. */
+   base colors and dark mode; this file sets the brand and adds what Pico lacks.
+   Colors meet WCAG AA (4.5:1) in both themes. */
 
 /* Brand: AgentClinic teal, light and dark (same selectors Pico uses for its themes) */
 [data-theme='light'],
 :root:not([data-theme='dark']) {
-  --pico-primary: #21867a;
-  --pico-primary-background: #21867a;
+  --pico-primary: #1f7f74;
+  --pico-primary-background: #1f7f74;
   --pico-primary-border: var(--pico-primary-background);
-  --pico-primary-underline: rgba(33, 134, 122, 0.5);
-  --pico-primary-hover: #1a6b61;
-  --pico-primary-hover-background: #1a6b61;
+  --pico-primary-underline: rgba(31, 127, 116, 0.5);
+  --pico-primary-hover: #17635a;
+  --pico-primary-hover-background: #17635a;
   --pico-primary-hover-border: var(--pico-primary-hover-background);
   --pico-primary-hover-underline: var(--pico-primary-hover);
-  --pico-primary-focus: rgba(33, 134, 122, 0.4);
+  --pico-primary-focus: rgba(31, 127, 116, 0.4);
   --pico-primary-inverse: #fff;
-  --accent-soft: #e3f4f2;
+  --badge-bg: #e3f4f2;
+  --badge-text: #1c776d;
 }
 
 @media only screen and (prefers-color-scheme: dark) {
@@ -28,8 +30,9 @@
     --pico-primary-hover-border: var(--pico-primary-hover-background);
     --pico-primary-hover-underline: var(--pico-primary-hover);
     --pico-primary-focus: rgba(79, 195, 180, 0.4);
-    --pico-primary-inverse: #fff;
-    --accent-soft: #1d3a37;
+    --pico-primary-inverse: #0b1f1c;
+    --badge-bg: #1d3a37;
+    --badge-text: #4fc3b4;
   }
 }
 
@@ -43,16 +46,25 @@
   --pico-primary-hover-border: var(--pico-primary-hover-background);
   --pico-primary-hover-underline: var(--pico-primary-hover);
   --pico-primary-focus: rgba(79, 195, 180, 0.4);
-  --pico-primary-inverse: #fff;
-  --accent-soft: #1d3a37;
+  --pico-primary-inverse: #0b1f1c;
+  --badge-bg: #1d3a37;
+  --badge-text: #4fc3b4;
 }
 
-/* Sticky footer and long-word safety */
+/* Content width: Pico's .container grows to 1200px/1450px on wide screens; keep Phase 1's
+   1024px. In px, because Pico scales rem up to 125% there. */
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+/* Sticky footer */
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  overflow-wrap: break-word;
 }
 
 body > main {
@@ -82,6 +94,7 @@ body > main {
 
 .site-footer p {
   margin: 0;
+  color: inherit; /* Pico colors every <p>; keep the footer muted */
 }
 
 /* Hero */
@@ -97,7 +110,8 @@ body > main {
 }
 
 .hero h1 {
-  font-size: clamp(2rem, 6vw, 3rem);
+  /* Capped in px: Pico's rem grows on wide screens; 48px matches Phase 1 */
+  font-size: clamp(2rem, 6vw, 48px);
   line-height: 1.15;
 }
 
@@ -123,6 +137,8 @@ body > main {
 }
 
 .cards article {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   margin: 0;
 }
@@ -136,13 +152,18 @@ body > main {
   color: var(--pico-muted-color);
 }
 
-/* Badges (e.g. "Coming soon", severity) */
+/* Badges (e.g. "Coming soon", severity); pinned to the card bottom so they line up */
 .badge {
   display: inline-block;
-  background: var(--accent-soft);
-  color: var(--pico-primary);
+  background: var(--badge-bg);
+  color: var(--badge-text);
   border-radius: 999px;
   padding: 0.125rem 0.75rem;
   font-size: 0.8125rem;
   font-weight: 600;
+}
+
+.cards .badge {
+  margin-top: auto;
+  align-self: flex-start;
 }
