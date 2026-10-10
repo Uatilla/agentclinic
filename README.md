@@ -4,7 +4,7 @@ Built as the course project for
 [Spec-Driven Development with Coding Agents](https://www.deeplearning.ai/courses/spec-driven-development-with-coding-agents)
 by DeepLearning.AI.
 
-- Certificate: _link coming soon_
+- Certificate: [View on DeepLearning.AI](https://www.deeplearning.ai/accomplishments/ec8d3c0f-ab95-4f54-866f-8fa8dc70233b?accomplishmentId=ec8d3c0f-ab95-4f54-866f-8fa8dc70233b&usp=sharing)
 - Study notes: [SDD guide](./prompts.md) and [OpenSpec guide](./OpenSpec_Guide.md)
 
 ## Input from stakeholders
