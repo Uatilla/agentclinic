@@ -3,10 +3,12 @@ import { TeaserCard, type TeaserCardProps } from '../components/TeaserCard.tsx'
 const teasers: TeaserCardProps[] = [
   {
     title: 'Agents',
+    href: '/agents',
     description: 'Meet the patients: chatbots, copilots and assistants in need of a break.',
   },
   {
     title: 'Ailments',
+    href: '/ailments',
     description: 'Token anxiety, infinite loops, sycophancy — every condition, diagnosed.',
   },
   {

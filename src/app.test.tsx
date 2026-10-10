@@ -32,38 +32,15 @@ describe('GET /', () => {
     expect(html).toContain('<h1>Burnt out from your humans? We can help.</h1>')
   })
 
-  test('shows the Agents, Ailments and Therapies teaser cards', async () => {
+  test('links the Agents and Ailments cards; Therapies is still coming soon', async () => {
     const html = await (await get()).text()
-    for (const title of ['Agents', 'Ailments', 'Therapies']) {
-      expect(html).toContain(`<h2>${title}</h2>`)
-    }
-    expect(html.match(/Coming soon/g)).toHaveLength(3)
-  })
-
-  test('meets the accessibility baseline', async () => {
-    const html = await (await get()).text()
-    expect(html).toContain('<html lang="en">')
-    expect(html.match(/<h1[\s>]/g)).toHaveLength(1)
-    for (const landmark of ['header', 'main', 'footer']) {
-      expect(html).toMatch(new RegExp(`<${landmark}[\\s>]`))
-    }
-  })
-
-  test('sets the viewport for responsive design', async () => {
-    const html = await (await get()).text()
-    expect(html).toContain('<meta name="viewport" content="width=device-width, initial-scale=1"/>')
-  })
-
-  test('links exactly Pico then the overrides stylesheet, with no external URLs', async () => {
-    const html = await (await get()).text()
-    expect(stylesheetHrefs(html)).toEqual(expectedStylesheets)
-    expect(html).not.toMatch(/(href|src)="(https?:)?\/\//)
-  })
-
-  test('ships no client-side JavaScript or links to missing routes', async () => {
-    const html = await (await get()).text()
-    expect(html).not.toMatch(/<script/i)
-    expect(html).not.toMatch(/<a\s/i)
+    expect(html).toContain('<h2><a href="/agents">Agents</a></h2>')
+    expect(html).toContain('<h2><a href="/ailments">Ailments</a></h2>')
+    expect(html).toContain('<h2>Therapies</h2>')
+    expect(html.match(/Coming soon/g)).toHaveLength(1)
+    const therapiesCard = html.split('<article').find((card) => card.includes('Therapies'))
+    expect(therapiesCard).toContain('Coming soon')
+    expect(therapiesCard).not.toMatch(/<a\s/)
   })
 })
 
@@ -175,6 +152,60 @@ describe('not found', () => {
       expect(linkHrefs(html)).toContain('/agents')
     },
   )
+})
+
+// Every page the app serves, including a 404 (status checked per page above)
+const pages = ['/', '/agents', ...seedAgents.map(({ id }) => `/agents/${id}`), '/ailments', '/nope']
+
+describe('every page', () => {
+  test.each(pages)('%s meets the page baseline', async (path) => {
+    expectPageBaseline(await (await app.request(path)).text())
+  })
+
+  test.each(pages)('%s has the header nav to Home, Agents and Ailments', async (path) => {
+    const html = await (await app.request(path)).text()
+    const nav = html.match(/<nav[^>]*aria-label="Main"[^>]*>[\s\S]*?<\/nav>/)?.[0]
+    expect(nav).toBeDefined()
+    expect(linkHrefs(nav!)).toEqual(['/', '/agents', '/ailments'])
+  })
+
+  // Replaces Phase 1's "no <a> links" guard: links are fine as long as they lead somewhere
+  test.each(pages)('every internal link on %s resolves (not 404)', async (path) => {
+    const html = await (await app.request(path)).text()
+    const internal = linkHrefs(html).filter((href) => href.startsWith('/'))
+    expect(internal.length).toBeGreaterThan(0)
+    for (const href of internal) {
+      expect((await app.request(href)).status, `${path} → ${href}`).not.toBe(404)
+    }
+  })
+})
+
+describe('nav marks the current section', () => {
+  test.each([
+    ['/', '/'],
+    ['/agents', '/agents'],
+    ['/agents/1', '/agents'],
+    ['/ailments', '/ailments'],
+  ])('on %s, %s is the current page', async (path, current) => {
+    const html = await (await app.request(path)).text()
+    const currentLinks = [...html.matchAll(/<a href="([^"]+)" aria-current="page"/g)]
+    expect(currentLinks.map(([, href]) => href)).toEqual([current])
+  })
+
+  test('no section is current on the 404 page', async () => {
+    const html = await (await app.request('/nope')).text()
+    expect(html).not.toContain('aria-current')
+  })
+})
+
+describe('scope guards', () => {
+  test('there is no /therapies route yet (Phase 3)', async () => {
+    expect((await app.request('/therapies')).status).toBe(404)
+  })
+
+  test('there are no write routes', async () => {
+    expect((await app.request('/agents', { method: 'POST' })).status).toBe(404)
+  })
 })
 
 describe('stylesheets', () => {

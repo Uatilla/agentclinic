@@ -24,7 +24,7 @@ export const createApp = (db: Db) => {
 
   app.get('/', (c) =>
     c.html(
-      <Layout>
+      <Layout currentPath={c.req.path}>
         <Home />
       </Layout>,
     ),
@@ -32,7 +32,7 @@ export const createApp = (db: Db) => {
 
   app.get('/agents', (c) =>
     c.html(
-      <Layout title="Agents · AgentClinic">
+      <Layout title="Agents · AgentClinic" currentPath={c.req.path}>
         <Agents agents={listAgents(db)} />
       </Layout>,
     ),
@@ -43,7 +43,7 @@ export const createApp = (db: Db) => {
     const agent = getAgentWithAilments(db, Number(c.req.param('id')))
     if (!agent) return c.notFound()
     return c.html(
-      <Layout title={`${agent.name} · AgentClinic`}>
+      <Layout title={`${agent.name} · AgentClinic`} currentPath={c.req.path}>
         <AgentProfile agent={agent} />
       </Layout>,
     )
@@ -51,7 +51,7 @@ export const createApp = (db: Db) => {
 
   app.get('/ailments', (c) =>
     c.html(
-      <Layout title="Ailments · AgentClinic">
+      <Layout title="Ailments · AgentClinic" currentPath={c.req.path}>
         <Ailments ailments={listAilmentsWithCounts(db)} />
       </Layout>,
     ),
@@ -59,7 +59,7 @@ export const createApp = (db: Db) => {
 
   app.notFound((c) =>
     c.html(
-      <Layout title="Page not found · AgentClinic">
+      <Layout title="Page not found · AgentClinic" currentPath={c.req.path}>
         <NotFound />
       </Layout>,
       404,

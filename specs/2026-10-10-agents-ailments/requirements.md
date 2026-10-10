@@ -78,6 +78,7 @@ so this phase also migrates the existing layout and home page to it.
 | Route ids | Numeric autoincrement `:id`; non-numeric or unknown → 404 | Simple; slugs can come later if needed |
 | Queries | Small data-access module (`src/db/queries.ts`); pages receive plain data. Agents and ailments sorted by name; a profile lists ailments most severe first | Pages stay easy to test and don't depend on Drizzle; the worst problem is what a reader looks for first |
 | Home links | Agents and Ailments cards link; Therapies stays "coming soon" | No links to routes that don't exist yet |
+| Current page in nav | `Layout` receives the request path; the matching nav link gets `aria-current="page"` (sections include their sub-pages, e.g. `/agents/1` → Agents) | Screen readers announce where you are; Pico styles it; no JavaScript |
 | Scope guard | Phase 1's "no `<a>` links" becomes "every internal link resolves (not 404)" | The old guard is now wrong on purpose; the new one keeps its intent |
 | CSS foundation | PicoCSS v2, default build (`pico.min.css`, not classless) | Semantic HTML gets polished styles, mobile-first and dark mode for free; the default build also gives `.container` and `.grid` |
 | Pico delivery | npm `@picocss/pico`, served from `node_modules` at `/public/vendor/pico.min.css` | Version pinned in the lockfile; no third-party request; route-testable |
