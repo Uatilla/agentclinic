@@ -12,10 +12,8 @@ This phase adds the first real data and the first pages built on it: the clinic'
 
 Guided by [`mission.md`](../mission.md) (scope: agents & ailments; playful but polished;
 responsive; tested and CI-green before merge) and [`tech-stack.md`](../tech-stack.md) (SQLite,
-Drizzle ORM + drizzle-kit, seed data, Hono JSX, PicoCSS, Vitest).
-
-> **Amended 2026-10-10:** PicoCSS adopted product-wide ([`tech-stack.md`](../tech-stack.md)).
-> This phase migrates the existing layout and home page to Pico and builds the new pages on it.
+Drizzle ORM + drizzle-kit, seed data, Hono JSX, PicoCSS, Vitest). PicoCSS is new product-wide,
+so this phase also migrates the existing layout and home page to it.
 
 ## Scope
 
@@ -25,17 +23,18 @@ Drizzle ORM + drizzle-kit, seed data, Hono JSX, PicoCSS, Vitest).
   - Install `@picocss/pico` and serve `pico.min.css` locally at `/public/vendor/pico.min.css`.
   - `Layout` links Pico first, then `public/styles.css`.
   - Layout and home page use Pico's semantic patterns (`.container`, `<nav>`, `<article>`
-    cards); the current look stays the same or better (teal brand, light/dark).
+    cards); the current look stays the same or better (teal brand, light/dark, content width).
   - `public/styles.css` shrinks to overrides: brand colors via `--pico-*` variables, the card
-    grid, severity badges.
+    grid, badges (with their own `--badge-*` tokens).
+  - Text and controls meet WCAG AA contrast (4.5:1) in light and dark mode.
 - **Data layer:** SQLite via Drizzle ORM (`better-sqlite3` driver), with drizzle-kit migrations
   committed to the repo.
 - **Schema:**
   - `agents`: id, name, model (e.g. "GPT-something", "Claude-ish"), bio.
   - `ailments`: id, name, description.
   - `agent_ailments`: join table (`agent_id`, `ailment_id`, `severity`); composite primary key;
-    `severity` is one of `mild`, `moderate`, `severe`.
-- **Seed data:** a small, playful set (about 5 agents, 6 ailments) where each agent has at least
+    `severity` is one of `mild`, `moderate`, `severe`, enforced by a database `CHECK`.
+- **Seed data:** a small, playful set (5 agents, 6 ailments) where each agent has at least
   one ailment and at least one ailment is shared by several agents. Ailment tone reference:
   hallucinations, context overload, prompt fatigue.
 - **Pages** (server-rendered inside the shared `Layout`, responsive):
@@ -46,7 +45,7 @@ Drizzle ORM + drizzle-kit, seed data, Hono JSX, PicoCSS, Vitest).
 - **Navigation:**
   - Header nav with links to Home, Agents and Ailments.
   - Home teaser cards for Agents and Ailments become links; Therapies stays "coming soon"
-    and is not a link.
+    and is not a link. `TeaserCard` gets an optional `href`; the badge shows only without one.
 - **Tests:** Vitest route tests against a fresh in-memory database seeded with the same seed
   data.
 
@@ -65,12 +64,13 @@ Drizzle ORM + drizzle-kit, seed data, Hono JSX, PicoCSS, Vitest).
 | Decision | Choice | Why |
 |---|---|---|
 | Agent ↔ ailment relationship | Many-to-many via `agent_ailments`, with `severity` | One ailment affects many agents (needed for Phase 4 matching); severity adds product value and fits the tone |
-| Severity values | Text column limited to `mild` / `moderate` / `severe` (Drizzle `text({ enum })`) | Readable in the DB and type-safe in TypeScript |
+| Severity values | Text column with Drizzle `text({ enum })` plus a `check()` constraint (`severity IN ('mild','moderate','severe')`) | `enum` only narrows the TypeScript type; the `CHECK` makes SQLite reject bad values too. Readable in the DB |
 | SQLite driver | `better-sqlite3` | Most common, stable Drizzle + drizzle-kit pairing; synchronous; prebuilt binaries for Node 24 |
 | Migrations | `drizzle-kit generate`; SQL files committed in `drizzle/`; applied with Drizzle's migrator | Schema history is reviewable in PRs; the same migrations run locally and in tests |
-| DB file | `data/agentclinic.db`, path from `DATABASE_URL` (default above), git-ignored | No binary data in git; easy to reset |
+| DB file | `data/agentclinic.db`, path from `DATABASE_URL` (default above), git-ignored; `createDb` creates the parent directory | No binary data in git; easy to reset; works on a fresh clone (better-sqlite3 doesn't create directories) |
 | Seeding | `npm run db:seed` script, idempotent (clears and re-inserts) | Repeatable local setup |
-| App wiring | `createApp(db)` factory; `src/index.ts` passes the file DB | Tests inject an in-memory DB without touching the file DB or opening a port |
+| App wiring | `createApp(db)` factory; `src/app.tsx` only exports it and opens nothing on import; `src/index.ts` creates the file DB and passes it | Tests inject an in-memory DB without touching the file DB or opening a port |
+| Static file paths | Resolved from the module, not the working directory (`require.resolve` for Pico, `import.meta.url` for `public/`) | Styles load no matter where the server is started from |
 | Test database | Fresh `:memory:` DB per test file: run migrations, then seed | Fast, isolated, and it tests the real migrations |
 | Route ids | Numeric autoincrement `:id`; non-numeric or unknown → 404 | Simple; slugs can come later if needed |
 | Queries | Small data-access module (`src/db/queries.ts`); pages receive plain data | Pages stay easy to test and don't depend on Drizzle |
@@ -78,14 +78,17 @@ Drizzle ORM + drizzle-kit, seed data, Hono JSX, PicoCSS, Vitest).
 | Scope guard | Phase 1's "no `<a>` links" becomes "every internal link resolves (not 404)" | The old guard is now wrong on purpose; the new one keeps its intent |
 | CSS foundation | PicoCSS v2, default build (`pico.min.css`, not classless) | Semantic HTML gets polished styles, mobile-first and dark mode for free; the default build also gives `.container` and `.grid` |
 | Pico delivery | npm `@picocss/pico`, served from `node_modules` at `/public/vendor/pico.min.css` | Version pinned in the lockfile; no third-party request; route-testable |
-| Brand color | Keep the Phase 1 teal by overriding `--pico-primary*` variables in `styles.css` | Keeps the brand without a custom Pico build |
+| Brand color | Phase 1 teal family via `--pico-primary*` overrides: light `#1f7f74` (darkened from `#2a9d8f`), dark `#4fc3b4` with dark text on teal buttons | Keeps the brand without a custom Pico build; the original teal fails AA contrast on white (3.3:1) |
+| Content width | Cap `.container` at `64rem`, as in Phase 1; hero headline `clamp()` capped in `rem` | Pico's container grows to 1450px and its root font to 125%, which made lines and the headline too large |
 | Custom CSS | `public/styles.css` keeps only overrides and components Pico lacks | Less CSS to maintain; Pico stays the single source of base styles |
-| Cards | Pico `<article>` inside the existing `auto-fit` card grid | Pico's `.grid` collapses to one column below 768px but doesn't reflow to 2 columns; the custom grid does |
-| Severity labels | Small badge styled in `styles.css` with a text label (not color alone) | Readable and accessible in light and dark mode |
+| Cards | Pico `<article>` inside the existing `auto-fit` card grid; card components return the `<article>` and the page wraps it in `<li>` | Pico's `.grid` collapses to one column below 768px but doesn't reflow to 2 columns; the custom grid does. Card components stay reusable outside lists |
+| Props types | Component props use a named, extracted type (`type FooProps`), per [`tech-stack.md`](../tech-stack.md) | Readable signatures; data arrays can reuse the type |
+| Badges | `.badge` with `--badge-bg` / `--badge-text` tokens per theme, a text label (not color alone), at least 4.5:1 contrast | Readable and accessible in light and dark mode; severity labels reuse it |
 | Responsive lists | Reuse the card grid for agent and ailment lists | One pattern, already responsive |
 
 ## Scripts (expected, added to Phase 1's)
 
 - `db:generate`: `drizzle-kit generate`
-- `db:migrate`: apply migrations to the file DB
+- `db:migrate`: `tsx src/db/migrate.ts`, applies migrations to the file DB (the app also
+  migrates on start via `createDb`; the script exists to migrate without starting the server)
 - `db:seed`: seed the file DB

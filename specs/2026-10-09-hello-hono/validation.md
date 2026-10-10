@@ -31,6 +31,10 @@ The phase can merge to `main` when every box below is checked.
 - [x] In a current evergreen browser, the page shows the header, hero, three teaser cards and
       footer, with styles applied.
 - [x] The copy matches the tone reference in `requirements.md` (playful but polished).
+> **Amended 2026-10-10:** the responsive boxes below were not ticked before merge. Phase 2
+> replaces the stylesheet with PicoCSS, so they are re-checked there instead (see
+> [`2026-10-10-agents-ailments/validation.md`](../2026-10-10-agents-ailments/validation.md)).
+
 - [ ] Responsive (browser dev tools), at each reference width from `tech-stack.md`:
   - [ ] 320px: no horizontal scroll; teaser cards stack in one column; text readable without
         zooming.

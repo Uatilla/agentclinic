@@ -6,18 +6,21 @@ The phase can merge to `main` when every box below is checked.
 
 - [ ] `npm ci` installs cleanly from the lockfile (including `better-sqlite3` on Node 24).
 - [ ] `npm run validate` passes: type-check with zero errors (strict mode), then all tests.
-- [ ] Tests run against a fresh, migrated and seeded `:memory:` DB; they never touch
-      `data/agentclinic.db`.
+- [ ] Tests run against a fresh, migrated and seeded `:memory:` DB: `src/app.tsx` exports only
+      `createApp` (importing it opens no DB), and no test sets `DATABASE_URL`.
 - [ ] Styling tests assert:
-  - [ ] `GET /public/vendor/pico.min.css` returns 200 with `text/css` (served locally, no CDN
-        URL in any page).
+  - [ ] `GET /public/vendor/pico.min.css` returns 200 with `text/css`, and the body is Pico.
   - [ ] `GET /public/styles.css` returns 200 with `text/css`.
-  - [ ] `@picocss/pico` is a dependency in `package.json`.
+  - [ ] `@picocss/pico` v2 is a dependency in `package.json`.
 - [ ] Data layer tests assert:
   - [ ] Migrations create `agents`, `ailments` and `agent_ailments`.
-  - [ ] Seed is idempotent: seeding twice gives the same row counts.
+  - [ ] Seed inserts 5 agents and 6 ailments; seeding twice gives the same row counts.
   - [ ] Every seeded agent has at least one ailment; at least one ailment is shared by 2+ agents.
-  - [ ] `severity` only accepts `mild`, `moderate`, `severe`.
+  - [ ] The database rejects a `severity` other than `mild`, `moderate`, `severe` (inserting
+        `'banana'` throws a `CHECK` constraint error).
+  - [ ] `createDb` on a path in a missing directory creates the directory.
+  - [ ] Query functions (`listAgents`, `getAgentWithAilments`, `listAilmentsWithCounts`) return
+        the seeded data; an unknown id returns nothing.
 - [ ] Route tests assert:
   - [ ] `GET /agents` returns 200 HTML listing every seeded agent, each linking to
         `/agents/:id`.
@@ -31,12 +34,13 @@ The phase can merge to `main` when every box below is checked.
   - [ ] `GET /` still passes all Phase 1 checks except the no-`<a>` guard, which is replaced
         below.
   - [ ] Home: Agents and Ailments cards link to `/agents` and `/ailments`; Therapies is still
-        "coming soon" and not a link.
+        "coming soon" and not a link ("Coming soon" appears exactly once).
   - [ ] Header nav links to `/`, `/agents` and `/ailments` on every page.
 - [ ] Baseline on every page (`/`, `/agents`, `/agents/:id`, `/ailments`, 404):
   - [ ] `<html lang="en">`, exactly one `<h1>`, and `<header>`, `<main>`, `<footer>` landmarks.
   - [ ] Viewport meta tag (`width=device-width, initial-scale=1`).
-  - [ ] Links `/public/vendor/pico.min.css` before `/public/styles.css`.
+  - [ ] Stylesheets are exactly `/public/vendor/pico.min.css` then `/public/styles.css` (no
+        external URLs).
   - [ ] No `<script>` tag (no client-side JavaScript).
 - [ ] Link integrity (replaces Phase 1's no-`<a>` guard): every internal `href` on every page
       above returns a non-404 status.
@@ -53,6 +57,12 @@ The phase can merge to `main` when every box below is checked.
 - [ ] Pico migration: the home page looks the same or better than Phase 1; the teal brand color
       shows in light and dark mode (OS setting); severity badges are readable in both.
 - [ ] `public/styles.css` contains only overrides and Pico-missing components (review only).
+- [ ] Contrast (WCAG AA, 4.5:1) checked with a contrast checker in light and dark mode: links,
+      badge text on badge background, text on primary buttons, muted footer text.
+- [ ] Footer text is muted; at 1280px the content is at most `64rem` wide and the headline
+      matches Phase 1's size.
+- [ ] Starting the server from another directory (`cd /tmp && npx tsx <repo>/src/index.ts`)
+      still serves both stylesheets.
 - [ ] Seed data and 404 copy match the tone (playful but polished).
 - [ ] Responsive (browser dev tools), on every new page, at each reference width from
       `tech-stack.md`:

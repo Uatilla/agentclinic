@@ -7,16 +7,21 @@ Every group must leave the repo working.
 
 1. Install `@picocss/pico` (v2).
 2. Serve `node_modules/@picocss/pico/css/pico.min.css` at `/public/vendor/pico.min.css`
-   (`serveStatic` with a path rewrite), registered before the `/public/*` handler.
+   (`serveStatic` with its `path` option), registered before the `/public/*` handler.
 3. In `Layout.tsx`, link Pico first, then `/public/styles.css`.
-4. Move the layout to Pico patterns: `.container` for page width, `<article>` for teaser cards.
-5. Shrink `public/styles.css` to overrides: `--pico-primary*` set to the Phase 1 teal (light and
-   dark), the `auto-fit` card grid, and a `.badge` for severity labels. Delete rules Pico
-   already covers (reset, typography, base colors, dark-mode palette).
-6. Add tests: Pico stylesheet returns 200 with `text/css`; it is linked before `styles.css`.
+4. Move the layout to Pico patterns: `.container` (capped at `64rem`) for page width, and a
+   `TeaserCard` component (extracted `TeaserCardProps`) that returns a Pico `<article>`; the
+   page wraps each card in `<li>`.
+5. Shrink `public/styles.css` to overrides: `--pico-primary*` set to the brand teal (light
+   `#1f7f74`, dark `#4fc3b4`, dark text on teal buttons), the `auto-fit` card grid, and a
+   `.badge` with `--badge-*` tokens (at least 4.5:1 contrast). Delete rules Pico already covers
+   (reset, typography, base colors, dark-mode palette).
+6. Add tests: Pico and `styles.css` return 200 with `text/css` (Pico's body is really Pico);
+   every page links exactly `[pico.min.css, styles.css]` in that order, with no external URLs.
+   Put the stylesheet check in a helper later page tests reuse.
 
 **Check:** `npm run validate` passes; the home page looks the same or better in light and dark
-mode; no horizontal scroll at 320px.
+mode (footer muted, headline and width as in Phase 1); no horizontal scroll at 320px.
 
 ## 2. Database tooling
 
@@ -32,21 +37,26 @@ mode; no horizontal scroll at 320px.
 ## 3. Schema, migrations and seed data
 
 1. Create `src/db/schema.ts` with `agents`, `ailments` and `agent_ailments` (composite primary
-   key, foreign keys, `severity` enum `mild`/`moderate`/`severe`).
+   key, foreign keys, `severity` enum `mild`/`moderate`/`severe` plus a `check()` constraint).
 2. Run `npm run db:generate` and commit the SQL in `drizzle/`.
-3. Create `src/db/client.ts`: `createDb(url)` opens `better-sqlite3`, enables foreign keys and
-   runs the migrations.
+3. Create `src/db/client.ts`: `createDb(url)` creates the parent directory for a file DB, opens
+   `better-sqlite3`, enables foreign keys and runs the migrations. Add `src/db/migrate.ts` for
+   `db:migrate`.
 4. Create `src/db/seed.ts`: seed data plus an idempotent `seed(db)` function, and a CLI entry
    used by `db:seed`.
 5. Add a test helper (`src/db/test-db.ts`) that returns a migrated, seeded `:memory:` DB.
 
-**Check:** `npm run db:migrate && npm run db:seed` creates `data/agentclinic.db`; running the
-seed twice gives the same row counts; a Vitest test asserts the seeded counts and that at least
-one ailment is shared by several agents.
+**Check:** on a fresh clone, `npm run db:migrate && npm run db:seed` creates
+`data/agentclinic.db`; Vitest tests cover the data-layer checks in
+[`validation.md`](./validation.md) (tables, seed counts and idempotency, shared ailment,
+severity `CHECK`).
 
 ## 4. App factory and data access
 
-1. Refactor `src/app.tsx` to `createApp(db)`; `src/index.ts` creates the file DB and passes it.
+1. Refactor `src/app.tsx` to export only `createApp(db)` (nothing opened on import);
+   `src/index.ts` creates the file DB and passes it. Resolve static paths from the module
+   (`require.resolve('@picocss/pico/css/pico.min.css')`, `public/` via `import.meta.url`), so
+   styles load from any working directory.
 2. Update `src/app.test.tsx` to build the app from the test DB; Phase 1 tests stay green.
 3. Create `src/db/queries.ts`: `listAgents`, `getAgentWithAilments(id)`,
    `listAilmentsWithCounts`, with unit tests.
@@ -79,7 +89,9 @@ the layout.
 
 1. Add header nav (Home, Agents, Ailments) to `Header.tsx` using Pico's `<nav>` with `<ul>`
    lists, with touch-friendly links (at least 44×44px) that wrap on small screens.
-2. Make the Agents and Ailments home cards links; keep Therapies as "coming soon", not a link.
+2. Give `TeaserCardProps` an optional `href`: with it, the card title is a link and there is no
+   badge. Agents and Ailments link; Therapies stays "coming soon". Update the Phase 1 home test:
+   "Coming soon" appears once, on Therapies.
 3. Replace Phase 1's no-`<a>` scope guard with a link-integrity test: on every page, each
    internal `href` returns a non-404 status.
 4. Expand tests to cover every automated check in [`validation.md`](./validation.md).
