@@ -1,0 +1,283 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "d6285114-92d7-4fde-aa19-df4231d8209e",
+  "prevId": "534a95cf-3755-4369-90a8-90e45556cd4b",
+  "tables": {
+    "agent_ailments": {
+      "name": "agent_ailments",
+      "columns": {
+        "agent_id": {
+          "name": "agent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ailment_id": {
+          "name": "ailment_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "severity": {
+          "name": "severity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "agent_ailments_agent_id_agents_id_fk": {
+          "name": "agent_ailments_agent_id_agents_id_fk",
+          "tableFrom": "agent_ailments",
+          "tableTo": "agents",
+          "columnsFrom": [
+            "agent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "agent_ailments_ailment_id_ailments_id_fk": {
+          "name": "agent_ailments_ailment_id_ailments_id_fk",
+          "tableFrom": "agent_ailments",
+          "tableTo": "ailments",
+          "columnsFrom": [
+            "ailment_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "agent_ailments_agent_id_ailment_id_pk": {
+          "columns": [
+            "agent_id",
+            "ailment_id"
+          ],
+          "name": "agent_ailments_agent_id_ailment_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "agent_ailments_severity_check": {
+          "name": "agent_ailments_severity_check",
+          "value": "severity IN ('mild', 'moderate', 'severe')"
+        }
+      }
+    },
+    "agents": {
+      "name": "agents",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bio": {
+          "name": "bio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "ailments": {
+      "name": "ailments",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "ailments_name_unique": {
+          "name": "ailments_name_unique",
+          "columns": [
+            "name"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "therapies": {
+      "name": "therapies",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "duration": {
+          "name": "duration",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "therapies_name_unique": {
+          "name": "therapies_name_unique",
+          "columns": [
+            "name"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "therapy_ailments": {
+      "name": "therapy_ailments",
+      "columns": {
+        "therapy_id": {
+          "name": "therapy_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ailment_id": {
+          "name": "ailment_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "effectiveness": {
+          "name": "effectiveness",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "therapy_ailments_therapy_id_therapies_id_fk": {
+          "name": "therapy_ailments_therapy_id_therapies_id_fk",
+          "tableFrom": "therapy_ailments",
+          "tableTo": "therapies",
+          "columnsFrom": [
+            "therapy_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "therapy_ailments_ailment_id_ailments_id_fk": {
+          "name": "therapy_ailments_ailment_id_ailments_id_fk",
+          "tableFrom": "therapy_ailments",
+          "tableTo": "ailments",
+          "columnsFrom": [
+            "ailment_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "therapy_ailments_therapy_id_ailment_id_pk": {
+          "columns": [
+            "therapy_id",
+            "ailment_id"
+          ],
+          "name": "therapy_ailments_therapy_id_ailment_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "therapy_ailments_effectiveness_check": {
+          "name": "therapy_ailments_effectiveness_check",
+          "value": "effectiveness IN ('low', 'medium', 'high')"
+        }
+      }
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

@@ -6,10 +6,10 @@ import { Layout } from './components/Layout.tsx'
 import type { Db } from './db/client.ts'
 import {
   getAgentWithAilments,
-  getTherapy,
+  getTherapyWithAilments,
   listAgents,
   listAilmentsWithCounts,
-  listTherapies,
+  listTherapiesWithCounts,
 } from './db/queries.ts'
 import { AgentProfile } from './pages/AgentProfile.tsx'
 import { Agents } from './pages/Agents.tsx'
@@ -69,13 +69,13 @@ export const createApp = (db: Db) => {
   app.get('/therapies', (c) =>
     c.html(
       <Layout title="Therapies · AgentClinic" currentPath={c.req.path}>
-        <Therapies therapies={listTherapies(db)} />
+        <Therapies therapies={listTherapiesWithCounts(db)} />
       </Layout>,
     ),
   )
 
   app.get('/therapies/:id{[0-9]+}', (c) => {
-    const therapy = getTherapy(db, Number(c.req.param('id')))
+    const therapy = getTherapyWithAilments(db, Number(c.req.param('id')))
     if (!therapy) return c.notFound()
     return c.html(
       <Layout title={`${therapy.name} · AgentClinic`} currentPath={c.req.path}>

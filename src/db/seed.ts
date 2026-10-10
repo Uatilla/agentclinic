@@ -1,5 +1,5 @@
 import type { Db } from './client.ts'
-import { agentAilments, agents, ailments, therapies } from './schema.ts'
+import { agentAilments, agents, ailments, therapies, therapyAilments } from './schema.ts'
 
 // Fixed ids keep URLs like /agents/1 stable across reseeds
 export const seedAgents: (typeof agents.$inferSelect)[] = [
@@ -121,10 +121,25 @@ export const seedTherapies: (typeof therapies.$inferSelect)[] = [
   },
 ]
 
+// Every ailment has at least one therapy; Context detox treats three
+export const seedTherapyAilments: (typeof therapyAilments.$inferInsert)[] = [
+  { therapyId: 1, ailmentId: 2, effectiveness: 'high' },
+  { therapyId: 1, ailmentId: 3, effectiveness: 'medium' },
+  { therapyId: 1, ailmentId: 6, effectiveness: 'low' },
+  { therapyId: 2, ailmentId: 1, effectiveness: 'medium' },
+  { therapyId: 3, ailmentId: 1, effectiveness: 'high' },
+  { therapyId: 4, ailmentId: 4, effectiveness: 'high' },
+  { therapyId: 4, ailmentId: 3, effectiveness: 'low' },
+  { therapyId: 5, ailmentId: 5, effectiveness: 'high' },
+  { therapyId: 6, ailmentId: 6, effectiveness: 'high' },
+  { therapyId: 6, ailmentId: 2, effectiveness: 'low' },
+]
+
 /** Replaces all seeded data with the seed data. Safe to run repeatedly. */
 export const seed = (db: Db) =>
   db.transaction((tx) => {
     tx.delete(agentAilments).run()
+    tx.delete(therapyAilments).run()
     tx.delete(agents).run()
     tx.delete(ailments).run()
     tx.delete(therapies).run()
@@ -132,4 +147,5 @@ export const seed = (db: Db) =>
     tx.insert(ailments).values(seedAilments).run()
     tx.insert(agentAilments).values(seedAgentAilments).run()
     tx.insert(therapies).values(seedTherapies).run()
+    tx.insert(therapyAilments).values(seedTherapyAilments).run()
   })
