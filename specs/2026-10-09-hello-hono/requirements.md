@@ -12,6 +12,11 @@ GitHub Actions).
 
 > **Amended 2026-10-09:** responsive design added as a product-wide requirement
 > ([`mission.md`](../mission.md), [`tech-stack.md`](../tech-stack.md)).
+>
+> **Amended 2026-10-10:** PicoCSS adopted as the CSS foundation
+> ([`tech-stack.md`](../tech-stack.md)). The "single `public/styles.css`" decision below is
+> superseded; Phase 2 ([`2026-10-10-agents-ailments`](../2026-10-10-agents-ailments/)) migrates
+> the layout and home page to Pico.
 
 ## Scope
 

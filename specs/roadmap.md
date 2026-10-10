@@ -15,7 +15,9 @@ Spec: [`2026-10-09-hello-hono`](./2026-10-09-hello-hono/)
 - First Vitest test for the home route
 - GitHub Actions CI (type-check + tests)
 
-## Phase 2: Agents & ailments
+## Phase 2: Agents & ailments — 🚧 In progress
+
+Spec: [`2026-10-10-agents-ailments`](./2026-10-10-agents-ailments/)
 
 - SQLite + Drizzle set up: `agents` and `ailments` schemas, plus the link between them;
   migrations and seed data
