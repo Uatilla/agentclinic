@@ -1,9 +1,33 @@
+import { EffectivenessBadge } from '../components/EffectivenessBadge.tsx'
 import { SeverityBadge } from '../components/SeverityBadge.tsx'
-import type { AgentWithAilments } from '../db/queries.ts'
+import type { AgentAilment, AgentWithAilments } from '../db/queries.ts'
 
 export type AgentProfileProps = {
   agent: AgentWithAilments
 }
+
+export type DiagnosisProps = AgentAilment
+
+/** One ailment on a profile: the ailment and its severity, then its therapies, best first. */
+const Diagnosis = ({ id, name, severity, therapies }: DiagnosisProps) => (
+  <li class="diagnosis">
+    <div class="diagnosis-head">
+      <a href={`/ailments/${id}`}>{name}</a> <SeverityBadge severity={severity} />
+    </div>
+    {therapies.length > 0 ? (
+      <ul class="recommendations" aria-label={`Therapies for ${name}`}>
+        {therapies.map((therapy) => (
+          <li>
+            <a href={`/therapies/${therapy.id}`}>{therapy.name}</a>{' '}
+            <EffectivenessBadge effectiveness={therapy.effectiveness} />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="recommendations-empty">No known cure — yet.</p>
+    )}
+  </li>
+)
 
 export const AgentProfile = ({ agent }: AgentProfileProps) => (
   <>
@@ -19,10 +43,8 @@ export const AgentProfile = ({ agent }: AgentProfileProps) => (
       <h2>Diagnosed ailments</h2>
       {agent.ailments.length > 0 ? (
         <ul class="diagnoses">
-          {agent.ailments.map(({ name, severity }) => (
-            <li>
-              <span>{name}</span> <SeverityBadge severity={severity} />
-            </li>
+          {agent.ailments.map((ailment) => (
+            <Diagnosis {...ailment} />
           ))}
         </ul>
       ) : (

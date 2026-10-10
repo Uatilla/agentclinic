@@ -7,7 +7,7 @@ import {
   seedTherapies,
   seedTherapyAilments,
 } from './db/seed.ts'
-import { agents, ailments, therapies } from './db/schema.ts'
+import { agentAilments, agents, ailments, therapies } from './db/schema.ts'
 import { createTestDb } from './db/test-db.ts'
 import {
   expectedStylesheets,
@@ -68,15 +68,28 @@ const agentsWith = (ailmentId: number) =>
     .sort(byRankThenName)
     .map(({ rank, ...row }) => row)
 
-/** The link and badge label of each row in the first `.diagnoses` list of `html`. */
-const listRows = (html: string) => {
-  const list = html.match(/<ul class="diagnoses">([\s\S]*?)<\/ul>/)?.[1] ?? ''
-  return [...list.matchAll(/<li>([\s\S]*?)<\/li>/g)].map(([, li]) => ({
-    href: li!.match(/<a href="([^"]+)"/)?.[1],
-    name: li!.match(/<a [^>]*>([^<]+)<\/a>/)?.[1],
-    label: li!.match(/class="badge[^"]*">([^<]+)</)?.[1],
-  }))
+/** The link and badge label of a row of markup. */
+const rowOf = (row: string) => ({
+  href: row.match(/<a href="([^"]+)"/)?.[1],
+  name: row.match(/<a [^>]*>([^<]+)<\/a>/)?.[1],
+  label: row.match(/class="badge[^"]*">([^<]+)</)?.[1],
+})
+
+/** The rows of the first `<ul class="…">` list of `html` (default: `.diagnoses`). */
+const listRows = (html: string, listClass = 'diagnoses') => {
+  const list = html.match(new RegExp(`<ul class="${listClass}"[^>]*>([\\s\\S]*?)</ul>`))?.[1]
+  return [...(list ?? '').matchAll(/<li>([\s\S]*?)<\/li>/g)].map(([, li]) => rowOf(li!))
 }
+
+/** Each diagnosis on an agent profile: its ailment row, plus its therapy rows. */
+const diagnosisRows = (html: string) =>
+  html
+    .split('<li class="diagnosis">')
+    .slice(1)
+    .map((diagnosis) => ({
+      ...rowOf(diagnosis.match(/<div class="diagnosis-head">([\s\S]*?)<\/div>/)![1]!),
+      therapies: listRows(diagnosis, 'recommendations'),
+    }))
 
 test('the app module only exports createApp, so importing it opens no database', () => {
   expect(Object.keys(appModule)).toEqual(['createApp'])
@@ -278,14 +291,20 @@ describe('GET /ailments/:id', () => {
   })
 })
 
-// Expected values come from the seed fixtures, not from the queries under test
+// Expected values come from the seed fixtures, not from the queries under test:
+// an agent's ailments, most severe first, each with its therapies, best first
 const diagnosesOf = (agentId: number) =>
   seedAgentAilments
     .filter((row) => row.agentId === agentId)
     .map(({ ailmentId, severity }) => ({
-      name: seedAilments.find(({ id }) => id === ailmentId)!.name,
+      href: `/ailments/${ailmentId}`,
+      name: nameOf(seedAilments, ailmentId),
       label: severityLabels[severity],
+      rank: severityRank[severity],
+      therapies: therapiesFor(ailmentId),
     }))
+    .sort(byRankThenName)
+    .map(({ rank, ...row }) => row)
 
 describe('GET /agents/:id', () => {
   test.each(seedAgents)(
@@ -301,14 +320,27 @@ describe('GET /agents/:id', () => {
 
       const expected = diagnosesOf(id)
       expect(expected.length).toBeGreaterThan(0)
-      const rows = html.split('<li>').filter((li) => li.includes('class="badge badge-'))
-      expect(rows).toHaveLength(expected.length)
-      for (const { name: ailment, label } of expected) {
-        const row = rows.find((li) => li.includes(`<span>${ailment}</span>`))
-        expect(row, ailment).toContain(`>${label}</span>`)
-      }
+      expect(diagnosisRows(html)).toEqual(expected)
     },
   )
+
+  test('every ailment on every profile lists at least one therapy', () => {
+    for (const { id } of seedAgents) {
+      for (const diagnosis of diagnosesOf(id)) {
+        expect(diagnosis.therapies.length, `${id} ${diagnosis.name}`).toBeGreaterThan(0)
+      }
+    }
+  })
+
+  test('shows "No known cure — yet." under an ailment with no therapies', async () => {
+    const uncuredDb = createTestDb()
+    uncuredDb.insert(ailments).values({ id: 99, name: 'Mystery bug', description: '???' }).run()
+    uncuredDb.insert(agentAilments).values({ agentId: 1, ailmentId: 99, severity: 'mild' }).run()
+    const html = await (await appModule.createApp(uncuredDb).request('/agents/1')).text()
+    const mystery = html.split('<li class="diagnosis">').find((d) => d.includes('Mystery bug'))
+    expect(mystery).toContain('No known cure — yet.')
+    expect(mystery).not.toContain('class="recommendations"')
+  })
 
   test('shows "Clean bill of health." for an agent with no ailments', async () => {
     const healthyDb = createTestDb()
@@ -324,9 +356,7 @@ describe('GET /agents/:id', () => {
 
   test('lists ailments most severe first', async () => {
     const html = await (await app.request('/agents/5')).text()
-    const order = ['Infinite loops', 'Token anxiety', 'Hallucinations'].map((name) =>
-      html.indexOf(`<span>${name}</span>`),
-    )
+    const order = [5, 6, 1].map((ailmentId) => html.indexOf(`<a href="/ailments/${ailmentId}">`))
     expect(order.every((at) => at > -1)).toBe(true)
     expect(order).toEqual([...order].sort((a, b) => a - b))
   })

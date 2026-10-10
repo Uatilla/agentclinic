@@ -336,3 +336,38 @@ a:focus-visible {
   align-items: center;
   min-height: 44px;
 }
+
+/* Agent profile: each diagnosis is the ailment row, then its therapies indented under it */
+.diagnoses > li.diagnosis {
+  display: block;
+}
+
+.diagnosis-head,
+.recommendations li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.diagnosis-head > .badge {
+  margin-inline-start: auto;
+}
+
+.recommendations,
+.recommendations-empty {
+  margin: 0 0 0 0.75rem;
+  padding: 0 0 0 0.75rem;
+  border-inline-start: 2px solid var(--pico-muted-border-color);
+  font-size: 0.9375rem;
+}
+
+.recommendations li {
+  padding: 0;
+  border-bottom: 0;
+}
+
+.recommendations-empty {
+  color: var(--pico-muted-color);
+}
