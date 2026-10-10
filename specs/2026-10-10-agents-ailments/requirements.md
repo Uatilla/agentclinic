@@ -70,7 +70,8 @@ so this phase also migrates the existing layout and home page to it.
 | Install scripts | `"allowScripts": { "better-sqlite3": false }` in `package.json` (npm 11) | v13 bundles prebuilt binaries, so its `node-gyp rebuild` script isn't needed; denying it runs no package code at install time and records the choice. A test opens an in-memory DB, so a release without a binary for the platform fails fast |
 | Migrations | `drizzle-kit generate`; SQL files committed in `drizzle/`; applied with Drizzle's migrator | Schema history is reviewable in PRs; the same migrations run locally and in tests |
 | DB file | `data/agentclinic.db`, path from `DATABASE_URL` (default above), git-ignored; `createDb` creates the parent directory | No binary data in git; easy to reset; works on a fresh clone (better-sqlite3 doesn't create directories) |
-| Seeding | `npm run db:seed` script, idempotent (clears and re-inserts) | Repeatable local setup |
+| Seeding | `npm run db:seed` script, idempotent (clears and re-inserts in one transaction), with fixed ids | Repeatable local setup; URLs like `/agents/1` stay stable across reseeds |
+| Referential integrity | Foreign keys enforced (`PRAGMA foreign_keys = ON`); deleting an agent or ailment cascades to its `agent_ailments` rows; ailment names unique | No orphan diagnoses; no duplicate ailments |
 | App wiring | `createApp(db)` factory; `src/app.tsx` only exports it and opens nothing on import; `src/index.ts` creates the file DB and passes it | Tests inject an in-memory DB without touching the file DB or opening a port |
 | Static file paths | Resolved from the module, not the working directory (`require.resolve` for Pico, `import.meta.url` for `public/`) | Styles load no matter where the server is started from |
 | Test database | Fresh `:memory:` DB per test file: run migrations, then seed | Fast, isolated, and it tests the real migrations |
