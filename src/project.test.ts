@@ -49,6 +49,13 @@ describe('project structure', () => {
     expect(new Database(':memory:').prepare('select 1 as one').get()).toEqual({ one: 1 })
   })
 
+  test('no test points at the file database through DATABASE_URL', () => {
+    const tests = globSync('src/**/*.test.{ts,tsx}', { cwd: root })
+    for (const path of tests) {
+      expect(readFileSync(resolve(root, path), 'utf8'), path).not.toMatch(/DATABASE_URL\s*=/)
+    }
+  })
+
   test('git-ignores the local database', () => {
     const ignored = readFileSync(resolve(root, '.gitignore'), 'utf8').split('\n')
     expect(ignored).toContain('/data')

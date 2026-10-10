@@ -3,21 +3,27 @@ import { fileURLToPath } from 'node:url'
 import { Hono } from 'hono'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Layout } from './components/Layout.tsx'
+import type { Db } from './db/client.ts'
 import { Home } from './pages/Home.tsx'
 
 // Resolved from this module, not the working directory, so styles load wherever the server starts
 const picoCss = createRequire(import.meta.url).resolve('@picocss/pico/css/pico.min.css')
 const projectRoot = fileURLToPath(new URL('..', import.meta.url))
 
-export const app = new Hono()
+/** Builds the app around a database, so tests can pass an in-memory one. Opens nothing itself. */
+export const createApp = (db: Db) => {
+  const app = new Hono()
 
-app.get('/public/vendor/pico.min.css', serveStatic({ path: picoCss }))
-app.use('/public/*', serveStatic({ root: projectRoot }))
+  app.get('/public/vendor/pico.min.css', serveStatic({ path: picoCss }))
+  app.use('/public/*', serveStatic({ root: projectRoot }))
 
-app.get('/', (c) =>
-  c.html(
-    <Layout>
-      <Home />
-    </Layout>,
-  ),
-)
+  app.get('/', (c) =>
+    c.html(
+      <Layout>
+        <Home />
+      </Layout>,
+    ),
+  )
+
+  return app
+}

@@ -1,6 +1,13 @@
 import { describe, expect, test } from 'vitest'
-import { app } from './app.tsx'
+import * as appModule from './app.tsx'
+import { createTestDb } from './db/test-db.ts'
 import { expectedStylesheets, stylesheetHrefs } from './test-utils.ts'
+
+const app = appModule.createApp(createTestDb())
+
+test('the app module only exports createApp, so importing it opens no database', () => {
+  expect(Object.keys(appModule)).toEqual(['createApp'])
+})
 
 describe('GET /', () => {
   const get = () => app.request('/')
