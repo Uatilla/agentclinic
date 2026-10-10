@@ -6,6 +6,7 @@ const links = [
   { href: '/', label: 'Home' },
   { href: '/agents', label: 'Agents' },
   { href: '/ailments', label: 'Ailments' },
+  { href: '/therapies', label: 'Therapies' },
 ]
 
 // A section is current on its own page and on pages below it (e.g. /agents/1 → Agents)

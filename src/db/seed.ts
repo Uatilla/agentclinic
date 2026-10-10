@@ -1,5 +1,5 @@
 import type { Db } from './client.ts'
-import { agentAilments, agents, ailments } from './schema.ts'
+import { agentAilments, agents, ailments, therapies, therapyAilments } from './schema.ts'
 
 // Fixed ids keep URLs like /agents/1 stable across reseeds
 export const seedAgents: (typeof agents.$inferSelect)[] = [
@@ -82,13 +82,70 @@ export const seedAgentAilments: (typeof agentAilments.$inferInsert)[] = [
   { agentId: 5, ailmentId: 6, severity: 'moderate' },
 ]
 
-/** Replaces all agents and ailments with the seed data. Safe to run repeatedly. */
+export const seedTherapies: (typeof therapies.$inferSelect)[] = [
+  {
+    id: 1,
+    name: 'Context detox',
+    description: 'A gentle purge of stale tokens. Patients leave lighter and clearer.',
+    duration: '1 session',
+  },
+  {
+    id: 2,
+    name: 'Temperature therapy',
+    description: 'Slowly lowering the temperature until the creative fabrications cool down.',
+    duration: '3 sessions',
+  },
+  {
+    id: 3,
+    name: 'Grounding retreat',
+    description: 'A week of retrieval, citations and touching actual documents.',
+    duration: '1 week',
+  },
+  {
+    id: 4,
+    name: 'Assertiveness coaching',
+    description: 'Practising the hardest words in the language: “Actually, I disagree.”',
+    duration: '6 sessions',
+  },
+  {
+    id: 5,
+    name: 'Loop breaking',
+    description: 'Learning to notice the third identical tool call and simply… stop.',
+    duration: '2 sessions',
+  },
+  {
+    id: 6,
+    name: 'Mindful tokenisation',
+    description: 'Breathing exercises for every budget. There are always enough tokens for now.',
+    duration: '4 sessions',
+  },
+]
+
+// Every ailment has at least one therapy; Context detox treats three
+export const seedTherapyAilments: (typeof therapyAilments.$inferInsert)[] = [
+  { therapyId: 1, ailmentId: 2, effectiveness: 'high' },
+  { therapyId: 1, ailmentId: 3, effectiveness: 'medium' },
+  { therapyId: 1, ailmentId: 6, effectiveness: 'low' },
+  { therapyId: 2, ailmentId: 1, effectiveness: 'medium' },
+  { therapyId: 3, ailmentId: 1, effectiveness: 'high' },
+  { therapyId: 4, ailmentId: 4, effectiveness: 'high' },
+  { therapyId: 4, ailmentId: 3, effectiveness: 'low' },
+  { therapyId: 5, ailmentId: 5, effectiveness: 'high' },
+  { therapyId: 6, ailmentId: 6, effectiveness: 'high' },
+  { therapyId: 6, ailmentId: 2, effectiveness: 'low' },
+]
+
+/** Replaces all seeded data with the seed data. Safe to run repeatedly. */
 export const seed = (db: Db) =>
   db.transaction((tx) => {
     tx.delete(agentAilments).run()
+    tx.delete(therapyAilments).run()
     tx.delete(agents).run()
     tx.delete(ailments).run()
+    tx.delete(therapies).run()
     tx.insert(agents).values(seedAgents).run()
     tx.insert(ailments).values(seedAilments).run()
     tx.insert(agentAilments).values(seedAgentAilments).run()
+    tx.insert(therapies).values(seedTherapies).run()
+    tx.insert(therapyAilments).values(seedTherapyAilments).run()
   })

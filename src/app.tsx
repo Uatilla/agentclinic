@@ -4,13 +4,23 @@ import { Hono } from 'hono'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Layout } from './components/Layout.tsx'
 import type { Db } from './db/client.ts'
-import { getAgentWithAilments, listAgents, listAilmentsWithCounts } from './db/queries.ts'
+import {
+  getAgentWithAilments,
+  getAilmentWithTherapiesAndAgents,
+  getTherapyWithAilments,
+  listAgents,
+  listAilmentsWithCounts,
+  listTherapiesWithCounts,
+} from './db/queries.ts'
 import { AgentProfile } from './pages/AgentProfile.tsx'
+import { AilmentDetail } from './pages/AilmentDetail.tsx'
 import { Agents } from './pages/Agents.tsx'
 import { Ailments } from './pages/Ailments.tsx'
 import { Home } from './pages/Home.tsx'
 import { NotFound } from './pages/NotFound.tsx'
 import { ServerError } from './pages/ServerError.tsx'
+import { Therapies } from './pages/Therapies.tsx'
+import { TherapyDetail } from './pages/TherapyDetail.tsx'
 
 // Resolved from this module, not the working directory, so styles load wherever the server starts
 const picoCss = createRequire(import.meta.url).resolve('@picocss/pico/css/pico.min.css')
@@ -57,6 +67,34 @@ export const createApp = (db: Db) => {
       </Layout>,
     ),
   )
+
+  app.get('/ailments/:id{[0-9]+}', (c) => {
+    const ailment = getAilmentWithTherapiesAndAgents(db, Number(c.req.param('id')))
+    if (!ailment) return c.notFound()
+    return c.html(
+      <Layout title={`${ailment.name} · AgentClinic`} currentPath={c.req.path}>
+        <AilmentDetail ailment={ailment} />
+      </Layout>,
+    )
+  })
+
+  app.get('/therapies', (c) =>
+    c.html(
+      <Layout title="Therapies · AgentClinic" currentPath={c.req.path}>
+        <Therapies therapies={listTherapiesWithCounts(db)} />
+      </Layout>,
+    ),
+  )
+
+  app.get('/therapies/:id{[0-9]+}', (c) => {
+    const therapy = getTherapyWithAilments(db, Number(c.req.param('id')))
+    if (!therapy) return c.notFound()
+    return c.html(
+      <Layout title={`${therapy.name} · AgentClinic`} currentPath={c.req.path}>
+        <TherapyDetail therapy={therapy} />
+      </Layout>,
+    )
+  })
 
   // Error pages mark no nav section: a 404 under /agents/… isn't "in" Agents
   app.notFound((c) =>

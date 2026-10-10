@@ -19,6 +19,10 @@
   --badge-text: #1c776d;
   --badge-mild-bg: #eef0f3;
   --badge-mild-text: #3f4652;
+  --badge-moderate-bg: #fbecd0;
+  --badge-moderate-text: #8a4b00;
+  --badge-severe-bg: #a8402b;
+  --badge-severe-text: #fff;
 }
 
 @media only screen and (prefers-color-scheme: dark) {
@@ -37,6 +41,10 @@
     --badge-text: #4fc3b4;
     --badge-mild-bg: #2a303c;
     --badge-mild-text: #d0d5de;
+    --badge-moderate-bg: #3d2b12;
+    --badge-moderate-text: #f0b85c;
+    --badge-severe-bg: #e8826a;
+    --badge-severe-text: #2a0e07;
     --pico-muted-color: #8a93a3; /* Pico's #7b8495 drops below 4.5:1 on dark cards */
   }
 }
@@ -56,6 +64,10 @@
   --badge-text: #4fc3b4;
   --badge-mild-bg: #2a303c;
   --badge-mild-text: #d0d5de;
+  --badge-moderate-bg: #3d2b12;
+  --badge-moderate-text: #f0b85c;
+  --badge-severe-bg: #e8826a;
+  --badge-severe-text: #2a0e07;
   --pico-muted-color: #8a93a3; /* Pico's #7b8495 drops below 4.5:1 on dark cards */
 }
 
@@ -114,13 +126,16 @@ a:focus-visible {
   text-underline-offset: 0.3em;
 }
 
-/* Phones: the nav takes its own left-aligned row, with tighter spacing */
+/* Phones: the nav takes its own left-aligned row, with tighter spacing; the links wrap
+   rather than overflow when they don't fit (e.g. 320px with a classic scrollbar) */
 @media (max-width: 35.999rem) {
   .site-header nav {
     --pico-nav-element-spacing-vertical: 0.25rem;
+    --pico-nav-element-spacing-horizontal: 0.625rem;
   }
 
   .site-header nav ul:last-child {
+    flex-wrap: wrap;
     margin-inline-start: calc(var(--pico-nav-element-spacing-horizontal) * -1);
   }
 }
@@ -218,9 +233,10 @@ a:focus-visible {
   color: var(--pico-muted-color);
 }
 
-/* Badges (e.g. "Coming soon", severity); pinned to the card bottom so they line up */
+/* Badges: severity and effectiveness ratings */
 .badge {
   display: inline-block;
+  white-space: nowrap;
   background: var(--badge-bg);
   color: var(--badge-text);
   border-radius: 999px;
@@ -234,7 +250,6 @@ a:focus-visible {
   margin-bottom: 0;
 }
 
-.cards .badge,
 .cards .card-meta {
   margin-top: auto;
   align-self: flex-start;
@@ -258,16 +273,42 @@ a:focus-visible {
   box-shadow: 0 0 0 2px var(--pico-primary);
 }
 
-/* Severity scale: mild neutral, moderate teal tint (.badge default), severe solid teal.
-   The text label carries the meaning; all pairs are at least 4.5:1. */
-.badge-mild {
+/* Two graded scales that never look alike: severity is warm (mild neutral, moderate amber
+   tint, severe solid red-brown); effectiveness is the brand teal (low neutral, medium teal
+   tint = .badge default, high solid teal). The text label carries the meaning; all pairs
+   are at least 4.5:1. */
+.badge-mild,
+.badge-low {
   background: var(--badge-mild-bg);
   color: var(--badge-mild-text);
 }
 
+.badge-moderate {
+  background: var(--badge-moderate-bg);
+  color: var(--badge-moderate-text);
+}
+
 .badge-severe {
+  background: var(--badge-severe-bg);
+  color: var(--badge-severe-text);
+}
+
+.badge-high {
   background: var(--pico-primary-background);
   color: var(--pico-primary-inverse);
+}
+
+/* Read by screen readers, hidden on screen (e.g. "Severity: " inside a badge) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Agent profile */
@@ -300,21 +341,68 @@ a:focus-visible {
   font-size: 1.25rem;
 }
 
-.diagnoses {
+.detail-list {
+  max-width: 40rem;
   padding: 0;
 }
 
-.diagnoses li {
+/* Rows are styled through direct children only, so nested lists start clean */
+.detail-list > li {
   list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
   padding: 0.5rem 0;
   border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
 }
 
-.diagnoses li:last-child {
+.detail-list > li:last-child {
   border-bottom: 0;
+}
+
+/* A link with its badge right after it; a long name wraps, the badge never leaves it */
+.rated-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 44px touch targets */
+.rated-row > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 0;
+}
+
+.rated-row > .badge {
+  flex-shrink: 0;
+}
+
+/* Agent profile: under each ailment, its labelled list of therapies, indented */
+.recommendations {
+  margin-inline-start: 0.75rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 2px solid var(--pico-muted-border-color);
+  font-size: 0.9375rem;
+}
+
+.recommendations ul {
+  margin: 0;
+  padding: 0;
+}
+
+.recommendations li {
+  list-style: none;
+}
+
+.recommendations-label {
+  margin: 0.25rem 0 0;
+  color: var(--pico-muted-color);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.recommendations-empty {
+  margin: 0.25rem 0 0.5rem;
+  color: var(--pico-muted-color);
 }

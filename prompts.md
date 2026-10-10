@@ -8,7 +8,7 @@ They give the agent persistent context across sessions and make decisions review
 🧹 = clear context · ⏸ = keep context
 1. **Constitution** — mission, tech stack, roadmap (tiny phases). Commit.
    🧹 after commit: everything now lives on disk.
-2. **Pick next phase** — from the roadmap; create one branch per phase.
+2. **Pick next phase** — from the roadmap; create one branch per phase (or per milestone).
    ⏸ go straight into the spec.
 3. **Feature spec** — dated dir in `specs/`: `requirements.md` (scope, decisions, context),
    `plan.md` (numbered task groups), `validation.md` (merge bar). Ask before writing.
@@ -23,6 +23,18 @@ They give the agent persistent context across sessions and make decisions review
 7. **Merge** — PR shows spec + code; CI green → merge to `main`.
 8. **Update & replan** — mark the phase done in the roadmap, then replan (see below), commit.
    🧹 then go to step 2.
+
+## Implementation loop (lessons)
+- **Re-review the spec after the first slice:** building one group exposes gaps (ordering,
+  empty states, placeholder data). Amend the spec with a dated note, commit, then continue.
+- **Per group:** build → test → fix plan → fix (repeat only if drifting from the plan) →
+  summary linked to plan + validation items → ask before the next group.
+- **Old tests failing on purpose is normal:** when the spec changes behavior, updating those
+  tests *is* following the spec.
+- **Automated ≠ done:** keep manual checks for look and layout; tests can pass on a broken page.
+- **Expected values come from fixtures/spec,** never from the code under test.
+- **Milestones:** consecutive phases that only make sense together can share one spec and
+  branch, built in phase order with a checkpoint between them.
 
 ## Constitution = project-wide, long-lived specs
 - `mission.md` — why / for whom → resolves ambiguous choices

@@ -53,18 +53,19 @@ The phase can merge to `main` when every box below is checked.
       above returns 200.
 - [x] Scope guard: no `/therapies` route (returns 404) and no write routes (`POST /agents`
       returns 404).
-- [ ] The GitHub Actions CI workflow runs on the PR (Node 24) and is green.
+- [x] The GitHub Actions CI workflow runs on the PR (Node 24) and is green. (Ran on the push of
+      the merge to `main` instead of a PR: run 38038108478, 93 tests green.)
 
 ## Manual
 
 - [x] `npm run db:migrate && npm run db:seed && npm run dev` starts the app with seeded data.
 - [x] `drizzle/` migrations are committed; `data/` is git-ignored.
-- [ ] In a current evergreen browser, the agents list, agent profile, ailments list and 404
+- [x] In a current evergreen browser, the agents list, agent profile, ailments list and 404
       page look consistent with the home page, with Pico and the overrides applied.
-- [ ] Pico migration: the home page looks the same or better than Phase 1; the teal brand color
+- [x] Pico migration: the home page looks the same or better than Phase 1; the teal brand color
       shows in light and dark mode (OS setting); severity badges are readable in both.
 - [x] `public/styles.css` contains only overrides and Pico-missing components (review only).
-- [ ] Contrast (WCAG AA, 4.5:1) checked with a contrast checker in light and dark mode: links,
+- [x] Contrast (WCAG AA, 4.5:1) checked with a contrast checker in light and dark mode: links,
       badge text on badge background (each severity), text on primary buttons, muted text on
       page and card backgrounds; focus outlines at least 3:1.
 - [x] Footer text is muted; at 1280px the content is at most `1024px` wide and the headline
@@ -72,7 +73,7 @@ The phase can merge to `main` when every box below is checked.
 - [x] Starting the server from another directory still serves the page and both stylesheets:
       `cd /tmp && <repo>/node_modules/.bin/tsx --tsconfig <repo>/tsconfig.json <repo>/src/index.ts`
       (`--tsconfig` because `tsx` reads it from the working directory, for the JSX settings).
-- [ ] Seed data and 404 copy match the tone (playful but polished).
+- [x] Seed data and 404 copy match the tone (playful but polished).
 - [x] Responsive (browser dev tools), on every page (including `/`, which Phase 1 deferred
       here), at each reference width from `tech-stack.md`:
   - [x] 320px: no horizontal scroll; cards stack in one column; header nav sits on its own

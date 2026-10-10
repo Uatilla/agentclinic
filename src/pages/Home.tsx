@@ -13,6 +13,7 @@ const teasers: TeaserCardProps[] = [
   },
   {
     title: 'Therapies',
+    href: '/therapies',
     description: 'Context detox, temperature therapy and other proven treatments.',
   },
 ]
