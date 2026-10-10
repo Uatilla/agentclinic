@@ -15,6 +15,12 @@ responsive; tested and CI-green before merge) and [`tech-stack.md`](../tech-stac
 Drizzle ORM + drizzle-kit, seed data, Hono JSX, PicoCSS, Vitest). PicoCSS is new product-wide,
 so this phase also migrates the existing layout and home page to it.
 
+> **Amended 2026-10-10 (during implementation and after the branch review):** decisions made
+> while building groups 3–7 were added to the table below (seeding with fixed ids, referential
+> integrity, query ordering, current page in nav), plus the review fixes: dark muted text and
+> focus rings to meet WCAG AA, graded severity badges, "Agents" naming, compact phone header,
+> empty and error states, `DATABASE_URL` normalisation and a separate seed CLI.
+
 ## Scope
 
 ### In
@@ -69,16 +75,19 @@ so this phase also migrates the existing layout and home page to it.
 | SQLite driver | `better-sqlite3` | Most common, stable Drizzle + drizzle-kit pairing; synchronous; prebuilt binaries for Node 24 |
 | Install scripts | `"allowScripts": { "better-sqlite3": false }` in `package.json` (npm 11) | v13 bundles prebuilt binaries, so its `node-gyp rebuild` script isn't needed; denying it runs no package code at install time and records the choice. A test opens an in-memory DB, so a release without a binary for the platform fails fast |
 | Migrations | `drizzle-kit generate`; SQL files committed in `drizzle/`; applied with Drizzle's migrator | Schema history is reviewable in PRs; the same migrations run locally and in tests |
-| DB file | `data/agentclinic.db`, path from `DATABASE_URL` (default above), git-ignored; `createDb` creates the parent directory | No binary data in git; easy to reset; works on a fresh clone (better-sqlite3 doesn't create directories) |
-| Seeding | `npm run db:seed` script, idempotent (clears and re-inserts in one transaction), with fixed ids | Repeatable local setup; URLs like `/agents/1` stay stable across reseeds |
+| DB file | `data/agentclinic.db`, path from `DATABASE_URL` (default above), git-ignored; `createDb` creates the parent directory. One helper normalises the URL for the app and drizzle-kit: strips a `file:` prefix; an empty value means the default | No binary data in git; easy to reset; works on a fresh clone (better-sqlite3 doesn't create directories); drizzle-kit and the app always open the same file |
+| Seeding | `npm run db:seed` (`src/db/seed-cli.ts`) calls `seed(db)` from `src/db/seed.ts`: idempotent (clears and re-inserts in one transaction), with fixed ids | Repeatable local setup; URLs like `/agents/1` stay stable across reseeds; a separate CLI file avoids fragile "is this the entry file?" checks |
 | Referential integrity | Foreign keys enforced (`PRAGMA foreign_keys = ON`); deleting an agent or ailment cascades to its `agent_ailments` rows; ailment names unique | No orphan diagnoses; no duplicate ailments |
 | App wiring | `createApp(db)` factory; `src/app.tsx` only exports it and opens nothing on import; `src/index.ts` creates the file DB and passes it | Tests inject an in-memory DB without touching the file DB or opening a port |
 | Static file paths | Resolved from the module, not the working directory (`require.resolve` for Pico, `import.meta.url` for `public/`) | Styles load no matter where the server is started from |
 | Test database | Fresh `:memory:` DB per test file: run migrations, then seed | Fast, isolated, and it tests the real migrations |
-| Route ids | Numeric autoincrement `:id`; non-numeric or unknown → 404 | Simple; slugs can come later if needed |
+| Route ids | Numeric autoincrement `:id`, matched by the route pattern `/agents/:id{[0-9]+}`; non-numeric (`abc`, `1.5`) or unknown → 404 | Simple; the pattern keeps non-numeric ids out of the handler; slugs can come later if needed |
 | Queries | Small data-access module (`src/db/queries.ts`); pages receive plain data. Agents and ailments sorted by name; a profile lists ailments most severe first | Pages stay easy to test and don't depend on Drizzle; the worst problem is what a reader looks for first |
 | Home links | Agents and Ailments cards link; Therapies stays "coming soon" | No links to routes that don't exist yet |
-| Current page in nav | `Layout` receives the request path; the matching nav link gets `aria-current="page"` (sections include their sub-pages, e.g. `/agents/1` → Agents) | Screen readers announce where you are; Pico styles it; no JavaScript |
+| Current page in nav | `Layout` receives the request path; the matching nav link gets `aria-current="page"` (sections include their sub-pages, e.g. `/agents/1` → Agents). Error pages (404, 500) mark no section | Screen readers announce where you are; Pico styles it; no JavaScript. A 404 under `/agents/…` is not "in" Agents |
+| Header | Brand links to `/`; under 36rem the nav sits on its own left-aligned row with tighter spacing | Conventional home link; keeps the phone header compact (about 100px) |
+| Page titles | `<Page> · AgentClinic` on every page except home (`AgentClinic`) | Distinct, readable browser tabs and history |
+| Naming | Nav, page headings and links say "Agents"; "patients" appears only in intro copy | What the nav says is what the page is called |
 | Scope guard | Phase 1's "no `<a>` links" becomes "every internal link resolves (not 404)" | The old guard is now wrong on purpose; the new one keeps its intent |
 | CSS foundation | PicoCSS v2, default build (`pico.min.css`, not classless) | Semantic HTML gets polished styles, mobile-first and dark mode for free; the default build also gives `.container` and `.grid` |
 | Pico delivery | npm `@picocss/pico`, served from `node_modules` at `/public/vendor/pico.min.css` | Version pinned in the lockfile; no third-party request; route-testable |
@@ -87,7 +96,11 @@ so this phase also migrates the existing layout and home page to it.
 | Custom CSS | `public/styles.css` keeps only overrides and components Pico lacks | Less CSS to maintain; Pico stays the single source of base styles |
 | Cards | Pico `<article>` inside the existing `auto-fit` card grid; card components return the `<article>` and the page wraps it in `<li>` | Pico's `.grid` collapses to one column below 768px but doesn't reflow to 2 columns; the custom grid does. Card components stay reusable outside lists |
 | Props types | Component props use a named, extracted type (`type FooProps`), per [`tech-stack.md`](../tech-stack.md) | Readable signatures; data arrays can reuse the type |
-| Badges | `.badge` with `--badge-bg` / `--badge-text` tokens per theme, a text label (not color alone), at least 4.5:1 contrast | Readable and accessible in light and dark mode; severity labels reuse it |
+| Badges | `.badge` with `--badge-bg` / `--badge-text` tokens per theme, a text label (not color alone), at least 4.5:1 contrast. Badges are statuses ("Coming soon", severity); counts ("2 agents affected", "No agents affected") are plain muted text | Readable and accessible in light and dark mode; one look per meaning |
+| Severity scale | Graded badges: mild neutral, moderate teal tint, severe solid teal with inverse text; all at least 4.5:1 | Severity reads at a glance, while the text label still carries the meaning |
+| Linked cards | The title link stretches over the whole card (`::after` overlay), with a solid 2px focus/hover ring | Large touch target with no JavaScript; the link name stays the card title |
+| Accessibility extras | Dark muted text lightened to `#8a93a3` (at least 4.5:1 on cards); a visible `:focus-visible` outline (at least 3:1) on every link | Pico's muted text on dark cards and its translucent focus ring fall below WCAG AA |
+| Empty and error states | An agent with no ailments shows "Clean bill of health."; unexpected errors render a 500 page inside the layout | Every page, including failures, meets the page baseline |
 | Responsive lists | Reuse the card grid for agent and ailment lists | One pattern, already responsive |
 
 ## Scripts (expected, added to Phase 1's)

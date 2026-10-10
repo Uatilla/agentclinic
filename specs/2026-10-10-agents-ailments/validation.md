@@ -19,16 +19,23 @@ The phase can merge to `main` when every box below is checked.
   - [ ] The database rejects a `severity` other than `mild`, `moderate`, `severe` (inserting
         `'banana'` throws a `CHECK` constraint error).
   - [ ] `createDb` on a path in a missing directory creates the directory.
+  - [ ] Deleting an agent deletes its `agent_ailments` rows (cascade); a duplicate ailment name
+        is rejected (`UNIQUE`).
+  - [ ] `DATABASE_URL` is normalised: a `file:` prefix is stripped; empty means the default.
+  - [ ] No `therapies` table exists (Phase 3 adds it).
   - [ ] Query functions (`listAgents`, `getAgentWithAilments`, `listAilmentsWithCounts`) return
         the seeded data; an unknown id returns nothing.
 - [ ] Route tests assert:
   - [ ] `GET /agents` returns 200 HTML listing every seeded agent, each linking to
         `/agents/:id`.
   - [ ] `GET /agents/:id` for a seeded agent returns 200 with their name, model, bio, and each
-        of their ailments with its severity.
+        of their ailments with its visible severity label (Mild, Moderate, Severe).
+  - [ ] An agent with no ailments shows "Clean bill of health."
   - [ ] `GET /agents/9999` and `GET /agents/abc` return 404 with the not-found page inside the
         layout.
   - [ ] An unknown path (e.g. `GET /nope`) returns 404 with the same not-found page.
+  - [ ] 404 pages, including ones under a section (`/agents/9999`), mark no nav item as current.
+  - [ ] An unexpected error returns 500 with an error page inside the layout.
   - [ ] `GET /ailments` returns 200 HTML listing every seeded ailment with its affected-agent
         count.
   - [ ] `GET /` still passes all Phase 1 checks except the no-`<a>` guard, which is replaced
@@ -36,14 +43,14 @@ The phase can merge to `main` when every box below is checked.
   - [ ] Home: Agents and Ailments cards link to `/agents` and `/ailments`; Therapies is still
         "coming soon" and not a link ("Coming soon" appears exactly once).
   - [ ] Header nav links to `/`, `/agents` and `/ailments` on every page.
-- [ ] Baseline on every page (`/`, `/agents`, `/agents/:id`, `/ailments`, 404):
+- [ ] Baseline on every page (`/`, `/agents`, `/agents/:id`, `/ailments`, 404, 500):
   - [ ] `<html lang="en">`, exactly one `<h1>`, and `<header>`, `<main>`, `<footer>` landmarks.
   - [ ] Viewport meta tag (`width=device-width, initial-scale=1`).
   - [ ] Stylesheets are exactly `/public/vendor/pico.min.css` then `/public/styles.css` (no
         external URLs).
   - [ ] No `<script>` tag (no client-side JavaScript).
 - [ ] Link integrity (replaces Phase 1's no-`<a>` guard): every internal `href` on every page
-      above returns a non-404 status.
+      above returns 200.
 - [ ] Scope guard: no `/therapies` route (returns 404) and no write routes (`POST /agents`
       returns 404).
 - [ ] The GitHub Actions CI workflow runs on the PR (Node 24) and is green.
@@ -58,21 +65,22 @@ The phase can merge to `main` when every box below is checked.
       shows in light and dark mode (OS setting); severity badges are readable in both.
 - [ ] `public/styles.css` contains only overrides and Pico-missing components (review only).
 - [ ] Contrast (WCAG AA, 4.5:1) checked with a contrast checker in light and dark mode: links,
-      badge text on badge background, text on primary buttons, muted footer text.
+      badge text on badge background (each severity), text on primary buttons, muted text on
+      page and card backgrounds; focus outlines at least 3:1.
 - [ ] Footer text is muted; at 1280px the content is at most `1024px` wide and the headline
       is `48px`, as in Phase 1.
 - [ ] Starting the server from another directory still serves the page and both stylesheets:
       `cd /tmp && <repo>/node_modules/.bin/tsx --tsconfig <repo>/tsconfig.json <repo>/src/index.ts`
       (`--tsconfig` because `tsx` reads it from the working directory, for the JSX settings).
 - [ ] Seed data and 404 copy match the tone (playful but polished).
-- [ ] Responsive (browser dev tools), on every new page, at each reference width from
-      `tech-stack.md`:
-  - [ ] 320px: no horizontal scroll; cards stack in one column; header nav wraps without
-        overflow; text readable without zooming.
+- [ ] Responsive (browser dev tools), on every page (including `/`, which Phase 1 deferred
+      here), at each reference width from `tech-stack.md`:
+  - [ ] 320px: no horizontal scroll; cards stack in one column; header nav sits on its own
+        row without overflow, header about 100px tall; text readable without zooming.
   - [ ] 768px: layout uses the extra width; nothing overflows.
   - [ ] 1280px: content is centered within the max width; cards sit side by side.
   - [ ] Nav links and cards are at least 44×44px touch targets.
 
 ## Scope guard
 
-- [ ] No therapies schema or seed data (review only: Phase 3 adds them).
+- [ ] No therapies seed data or pages (review only; the missing table is tested above).

@@ -11,8 +11,7 @@ Every group must leave the repo working.
    both from the module, not the working directory:
    `require.resolve('@picocss/pico/css/pico.min.css')` and `public/` via `import.meta.url`.
 3. In `Layout.tsx`, link Pico first, then `/public/styles.css`.
-4. Move the layout to Pico patterns: `.container` (capped at `1024px` from 1280px up) for page
-   width, and a
+4. Move the layout to Pico patterns: `.container` (capped at `1024px` from 1280px up) for page width, and a
    `TeaserCard` component (extracted `TeaserCardProps`) that returns a Pico `<article>`; the
    page wraps each card in `<li>`.
 5. Shrink `public/styles.css` to overrides: `--pico-primary*` set to the brand teal (light
@@ -67,8 +66,8 @@ severity `CHECK`).
 
 ## 5. List pages: `/agents` and `/ailments`
 
-1. Create `src/pages/Agents.tsx`: heading and a card (Pico `<article>`) per agent (name, model) linking to
-   `/agents/:id`.
+1. Create `src/pages/Agents.tsx`: heading and a card (Pico `<article>`) per agent (name,
+   model) linking to `/agents/:id`.
 2. Create `src/pages/Ailments.tsx`: heading and a card per ailment (name, description, number
    of agents affected).
 3. Wire both routes; add route tests (status, content, one `<h1>`, links).
@@ -100,3 +99,23 @@ the layout.
 5. Update `README.md` with the database setup steps.
 
 **Check:** `npm run validate` passes, then the manual checks in [`validation.md`](./validation.md).
+
+## 8. Review fixes
+
+Added after the branch review (see the amendment note in [`requirements.md`](./requirements.md)).
+
+1. Accessibility: dark muted text `#8a93a3`; `:focus-visible` outline on links; 404 and 500
+   pages mark no nav section.
+2. Header: brand links to `/`; compact phone header (nav on its own left-aligned row).
+3. Naming and copy: "Agents" headings and back link; fix the "Token anxiety" description.
+4. Badges: graded severity styles; affected-agent counts as muted text.
+5. Empty and error states: "Clean bill of health." on a profile with no ailments;
+   `app.onError` renders a 500 page in the layout.
+6. Data: one `DATABASE_URL` helper shared by `createDb` and `drizzle.config.ts`; move the seed
+   CLI to `src/db/seed-cli.ts`.
+7. Tests: link integrity requires 200; profile checks the visible severity label and that
+   ailments are listed; 404 under a section marks no nav item; cascade delete, unique ailment
+   names, no therapies table, empty state, 500 page, `DATABASE_URL` helper.
+
+**Check:** `npm run validate` passes; measured contrast and screenshots at 320/768/1280 in light
+and dark.
