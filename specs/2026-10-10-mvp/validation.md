@@ -45,7 +45,8 @@ The MVP can merge to `main` when every box below is checked.
 - [x] Link integrity: every internal `href` on every page above returns 200.
 - [x] Scope guard: no booking or dashboard routes (`/appointments`, `/dashboard` → 404) and no
       write routes (`POST /therapies`, `POST /agents` → 404).
-- [ ] The GitHub Actions CI workflow is green on the `mvp` → `main` pull request (Node 24).
+- [x] The GitHub Actions CI workflow is green on the `mvp` → `main` pull request (Node 24).
+      (PR #2, run 38061666890.)
 
 ## Manual
 
